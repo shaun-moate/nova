@@ -90,12 +90,14 @@ def compile_program(program):
         call_cmd()
 
 def call_cmd():
-    print("-------------------------------------------")
-    print("Generating output.asm ...")
+    print("BUILD:-------------------------------------")
+    print("run: nasm -felf64 build/output.asm")
     subprocess.call(["nasm", "-felf64", "build/output.asm"])
-    print("Linking output into output.o ...")
+    print("run: ld -o build/output build/output.o")
     subprocess.call(["ld", "-o", "build/output", "build/output.o"])
-    print("DONE! output is now available to run ...")
+    print("RESULTS:-----------------------------------")
+    print("run: build/output")
+    subprocess.call(["build/output"])
     print("-------------------------------------------")
 
 if __name__ == '__main__':
