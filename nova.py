@@ -5,7 +5,7 @@ import subprocess
 import bin.config as cfg
 from bin.common import uncons, iota
 from bin.help import usage
-from bin.lexer import parse_program_from_file
+from bin.lexer import parse_program_from_tokens
 
 cfg.OP_PUSH      = iota(True)
 cfg.OP_PLUS      = iota()
@@ -113,14 +113,14 @@ if __name__ == '__main__':
             print("ERROR: no input file provided to simulation")
             usage(program)
         (input_file_path, argv) = uncons(argv)
-        program = parse_program_from_file(input_file_path)
+        program = parse_program_from_tokens(input_file_path)
         simulate_program(program)
     elif subcommand == "--compile" or subcommand == "-c":
         if len(argv) < 1:
             print("ERROR: no input file provided to compilation")
             usage(program)
         (input_file_path, argv) = uncons(argv)
-        program = parse_program_from_file(input_file_path)
+        program = parse_program_from_tokens(input_file_path)
         compile_program(program)
     elif subcommand == "--help":
         usage(program)

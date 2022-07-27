@@ -14,19 +14,42 @@ def minus():
 def dump():
     return (cfg.OP_DUMP, )
 
-def parse_program_from_file(input_file_path):
-    with open(input_file_path, "r") as f:
-        return [parse_token_as_op(token) for token in f.read().split()]
-
 def parse_token_as_op(token):
+    (file_path, row, col, word) = token
     assert cfg.OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
-    if token == "+":
+    if word == "+":
         return plus()
-    elif token == "-":
+    elif word == "-":
         return minus()
-    elif token == "print":
+    elif word == "print":
         return dump()
-    elif isinstance(int(token), int):
-        return push(int(token))
+    elif "." not in word:
+        try:
+            return push(int(word))
+        except ValueError as err:
+            print("%s:%d:%d:   %s " % (file_path, row, col, err))
+            exit(1)
     else:
         assert False, "Operand is unreachable"
+
+def parse_program_from_tokens(input_file_path):
+    with open(input_file_path, "r") as file:
+        return[parse_token_as_op(token) for token in parse_tokens_from_file(input_file_path)]
+
+def parse_tokens_from_file(input_file_path):
+    with open(input_file_path, "r") as file:
+        return [(input_file_path, row+1, col+1, token)
+                for (row, line) in enumerate(file.readlines())
+                for (col, token) in parse_line(line)]
+
+def parse_line(line):
+    start = find_token(line, 0, lambda x: not x.isspace())
+    while start < len(line):
+        end = find_token(line, start, lambda x: x.isspace())
+        yield(start, line[start:end])
+        start = find_token(line, end+1, lambda x: not x.isspace())
+
+def find_token(line, start, predicate):
+    while start < len(line) and not predicate(line[start]):
+        start += 1
+    return start
