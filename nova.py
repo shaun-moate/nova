@@ -5,18 +5,19 @@ import subprocess
 import bin.config as cfg
 from bin.common import uncons, iota
 from bin.help import usage
-from bin.lexer import parse_program_from_tokens
+from bin.lexer import parse_program_from_file
 
 cfg.OP_PUSH      = iota(True)
 cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
+cfg.OP_EQUAL     = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
 
 def simulate_program(program):
     stack = []
     for op in program:
-        assert cfg.OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
+        assert cfg.OP_COUNT == 5, "Exhaustive list of operands in simulate_program()"
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
         elif op[0] == cfg.OP_PLUS:
@@ -27,12 +28,15 @@ def simulate_program(program):
             x = stack.pop()
             y = stack.pop()
             stack.append(y - x)
+        elif op[0] == cfg.OP_EQUAL:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(y == x)
         elif op[0] == cfg.OP_DUMP:
             x = stack.pop()
             print(x)
         else:
             assert False, "Operands is unreachable"
-
 
 def compile_program(program):
     with open("build/output.asm", "w") as out:
@@ -74,13 +78,15 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for op in program:
-            assert cfg.OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
+            assert cfg.OP_COUNT == 5, "Exhaustive list of operands in compile_program()"
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
                 out.write("    pop rax\n    pop rbx\n    add rax, rbx\n    push rax\n")
             elif op[0] == cfg.OP_MINUS:
                 out.write("    pop rax\n    pop rbx\n    sub rbx, rax\n    push rbx\n")
+            elif op[0] == cfg.OP_EQUAL:
+                out.write("    mov rcx, 0\n    mov rdx, 1\n    pop rax\n    pop rbx\n    cmp rax, rbx\n    cmove rcx, rdx\n    push rcx\n")
             elif op[0] == cfg.OP_DUMP:
                 out.write("    pop rdi\n    call dump\n")
             else:
@@ -113,14 +119,14 @@ if __name__ == '__main__':
             print("ERROR: no input file provided to simulation")
             usage(program)
         (input_file_path, argv) = uncons(argv)
-        program = parse_program_from_tokens(input_file_path)
+        program = parse_program_from_file(input_file_path)
         simulate_program(program)
     elif subcommand == "--compile" or subcommand == "-c":
         if len(argv) < 1:
             print("ERROR: no input file provided to compilation")
             usage(program)
         (input_file_path, argv) = uncons(argv)
-        program = parse_program_from_tokens(input_file_path)
+        program = parse_program_from_file(input_file_path)
         compile_program(program)
     elif subcommand == "--help":
         usage(program)
