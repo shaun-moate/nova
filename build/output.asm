@@ -58,6 +58,14 @@ _start:
     push rax
     pop rdi
     call dump
+    push 13
+    push 13
+    pop rax
+    pop rbx
+    sub rbx, rax
+    push rbx
+    pop rdi
+    call dump
     mov rax, 60
     mov rdi, 0
     syscall

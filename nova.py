@@ -2,48 +2,32 @@
 import sys
 import subprocess
 
-iota_counter = 0
-def iota(reset=False):
-    global iota_counter
-    if reset == True:
-        iota_counter = 0
-    result = iota_counter
-    iota_counter += 1
-    return result
+import bin.config as cfg
+from bin.common import uncons, iota
+from bin.help import usage
+from bin.lexer import parse_program_from_file
 
-OP_PUSH  = iota(True)
-OP_PLUS  = iota()
-OP_MINUS = iota()
-OP_DUMP = iota()
-OP_COUNT = iota()
-
-def push(value):
-    return (OP_PUSH, value)
-
-def plus():
-    return (OP_PLUS, )
-
-def minus():
-    return (OP_MINUS, )
-
-def dump():
-    return (OP_DUMP, )
+cfg.OP_PUSH      = iota(True)
+cfg.OP_PLUS      = iota()
+cfg.OP_MINUS     = iota()
+cfg.OP_DUMP      = iota()
+cfg.OP_COUNT     = iota()
 
 def simulate_program(program):
     stack = []
     for op in program:
-        assert OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
-        if op[0] == OP_PUSH:
+        assert cfg.OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
+        if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
-        elif op[0] == OP_PLUS:
+        elif op[0] == cfg.OP_PLUS:
             x = stack.pop()
             y = stack.pop()
             stack.append(x + y)
-        elif op[0] == OP_MINUS:
+        elif op[0] == cfg.OP_MINUS:
             x = stack.pop()
             y = stack.pop()
             stack.append(y - x)
-        elif op[0] == OP_DUMP:
+        elif op[0] == cfg.OP_DUMP:
             x = stack.pop()
             print(x)
         else:
@@ -51,7 +35,7 @@ def simulate_program(program):
 
 
 def compile_program(program):
-    with open("output.asm", "w") as out:
+    with open("build/output.asm", "w") as out:
         out.write("segment .text\n")
 
         out.write("dump:\n")
@@ -90,51 +74,29 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for op in program:
-            assert OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
-            if op[0] == OP_PUSH:
+            assert cfg.OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
+            if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
-            elif op[0] == OP_PLUS:
+            elif op[0] == cfg.OP_PLUS:
                 out.write("    pop rax\n    pop rbx\n    add rax, rbx\n    push rax\n")
-            elif op[0] == OP_MINUS:
+            elif op[0] == cfg.OP_MINUS:
                 out.write("    pop rax\n    pop rbx\n    sub rbx, rax\n    push rbx\n")
-            elif op[0] == OP_DUMP:
+            elif op[0] == cfg.OP_DUMP:
                 out.write("    pop rdi\n    call dump\n")
             else:
                 assert False, "Operands is unreachable"
         out.write("    mov rax, 60\n    mov rdi, 0\n    syscall")
         out.close()
-        subprocess.call(["nasm", "-felf64", "output.asm"])
-        subprocess.call(["ld", "-o", "output", "output.o"])
+        call_cmd()
 
-def parse_program_from_file(input_file_path):
-    with open(input_file_path, "r") as f:
-        return [parse_token_as_op(token) for token in f.read().split()]
-
-def parse_token_as_op(token):
-    assert OP_COUNT == 4, "Exhaustive list of operands in emulate_program()"
-    if token == "+":
-        return plus()
-    elif token == "-":
-        return minus()
-    elif token == "print":
-        return dump()
-    elif isinstance(int(token), int):
-        return push(int(token))
-    else:
-        assert False, "Operand is unreachable"
-
-def nova_usage():
+def call_cmd():
     print("-------------------------------------------")
-    print("Usage: nova <SUBCOMMAND> [ARGS]")
-    print("SUBCOMMANDS:")
-    print("    simulate <file>       Simulate the program")
-    print("    compile  <file>       Compile the program")
+    print("Generating output.asm ...")
+    subprocess.call(["nasm", "-felf64", "build/output.asm"])
+    print("Linking output into output.o ...")
+    subprocess.call(["ld", "-o", "build/output", "build/output.o"])
+    print("DONE! output is now available to run ...")
     print("-------------------------------------------")
-    exit(1)
-
-
-def uncons(xs):
-    return (xs[0], xs[1:])
 
 if __name__ == '__main__':
     argv = sys.argv
@@ -142,22 +104,24 @@ if __name__ == '__main__':
     (program, argv) = uncons(argv)
     if len(argv) < 1:
         print("ERROR: no subcommand has been provided")
-        nova_usage()
+        usage(program)
     (subcommand, argv) = uncons(argv)
-    if subcommand == "simulate":
+    if subcommand == "--simulate" or subcommand == "-s":
         if len(argv) < 1:
             print("ERROR: no input file provided to simulation")
-            nova_usage()
+            usage(program)
         (input_file_path, argv) = uncons(argv)
         program = parse_program_from_file(input_file_path)
         simulate_program(program)
-    elif subcommand == "compile":
+    elif subcommand == "--compile" or subcommand == "-c":
         if len(argv) < 1:
             print("ERROR: no input file provided to compilation")
-            nova_usage()
+            usage(program)
         (input_file_path, argv) = uncons(argv)
         program = parse_program_from_file(input_file_path)
         compile_program(program)
+    elif subcommand == "--help":
+        usage(program)
     else:
         print("ERROR: unknown nova subcommand '%s'" % (subcommand))
-        nova_usage()
+        usage(program)
