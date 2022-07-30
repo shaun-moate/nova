@@ -15,46 +15,79 @@ cfg.OP_EQUAL     = iota()
 cfg.OP_NOT_EQUAL = iota()
 cfg.OP_GREATER   = iota()
 cfg.OP_GR_EQ     = iota()
+cfg.OP_LESSER    = iota()
+cfg.OP_LESS_EQ   = iota()
+cfg.OP_IF        = iota()
+cfg.OP_END       = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
 
 def simulate_program(program):
     stack = []
-    for op in program:
-        assert cfg.OP_COUNT == 9, "Exhaustive list of operands in simulate_program()"
+    ip = 0
+    while ip < len(program):
+        assert cfg.OP_COUNT == 13, "Exhaustive list of operands in simulate_program()"
+        op = program[ip]
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
+            ip += 1
         elif op[0] == cfg.OP_PLUS:
             x = stack.pop()
             y = stack.pop()
             stack.append(x + y)
+            ip += 1
         elif op[0] == cfg.OP_MINUS:
             x = stack.pop()
             y = stack.pop()
             stack.append(y - x)
+            ip += 1
         elif op[0] == cfg.OP_MULT:
             x = stack.pop()
             y = stack.pop()
             stack.append(y * x)
+            ip += 1
         elif op[0] == cfg.OP_EQUAL:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y == x))
+            ip += 1
         elif op[0] == cfg.OP_NOT_EQUAL:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y != x))
+            ip += 1
         elif op[0] == cfg.OP_GREATER:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y > x))
+            ip += 1
         elif op[0] == cfg.OP_GR_EQ:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y >= x))
+            ip += 1
+        elif op[0] == cfg.OP_LESSER:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(int(y < x))
+            ip += 1
+        elif op[0] == cfg.OP_LESS_EQ:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(int(y <= x))
+            ip += 1
+        elif op[0] == cfg.OP_IF:
+            assert len(op) > 1, "ERROR: 'if' block has no referenced 'end'"
+            if stack.pop() == 0:
+                ip = op[1]
+            else:
+                ip += 1
+        elif op[0] == cfg.OP_END:
+            ip += 1
         elif op[0] == cfg.OP_DUMP:
             x = stack.pop()
             print(x)
+            ip += 1
         else:
             assert False, "Operands is unreachable"
 
@@ -98,7 +131,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for op in program:
-            assert cfg.OP_COUNT == 9, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 13, "Exhaustive list of operands in compile_program()"
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
@@ -148,6 +181,29 @@ def compile_program(program):
                 out.write("    cmp rbx, rax\n")
                 out.write("    cmovge rcx, rdx\n")
                 out.write("    push rcx\n")
+            elif op[0] == cfg.OP_LESSER:
+                out.write("    mov rcx, 0\n")
+                out.write("    mov rdx, 1\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    cmp rbx, rax\n")
+                out.write("    cmovl rcx, rdx\n")
+                out.write("    push rcx\n")
+            elif op[0] == cfg.OP_LESS_EQ:
+                out.write("    mov rcx, 0\n")
+                out.write("    mov rdx, 1\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    cmp rbx, rax\n")
+                out.write("    cmovle rcx, rdx\n")
+                out.write("    push rcx\n")
+            elif op[0] == cfg.OP_IF:
+                assert len(op) > 1, "ERROR: 'if' block has no referenced 'end'"
+                out.write("    pop rax\n")
+                out.write("    test rax, rax\n")
+                out.write("    jz addr_%d\n" % op[1])
+            elif op[0] == cfg.OP_END:
+                out.write("addr_%d:\n" % op[1])
             elif op[0] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")

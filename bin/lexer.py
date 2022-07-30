@@ -26,12 +26,24 @@ def greater_than():
 def greater_than_or_equal():
     return (cfg.OP_GR_EQ, )
 
+def less_than():
+    return (cfg.OP_LESSER, )
+
+def less_than_or_equal():
+    return (cfg.OP_LESS_EQ, )
+
+def iff():
+    return (cfg.OP_IF, )
+
+def end():
+    return (cfg.OP_END, )
+
 def dump():
     return (cfg.OP_DUMP, )
 
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
-    assert cfg.OP_COUNT == 9, "Exhaustive list of operands in emulate_program()"
+    assert cfg.OP_COUNT == 13, "Exhaustive list of operands in parse_token_as_op()"
     if word == "+":
         return plus()
     elif word == "-":
@@ -42,10 +54,18 @@ def parse_token_as_op(token):
         return equal()
     elif word == "!=":
         return not_equal()
-    elif word == ">=":
-        return greater_than_or_equal()
     elif word == ">":
         return greater_than()
+    elif word == ">=":
+        return greater_than_or_equal()
+    elif word == "<":
+        return less_than()
+    elif word == "<=":
+        return less_than_or_equal()
+    elif word == "if":
+        return iff()
+    elif word == "end":
+        return end()
     elif word == "print":
         return dump()
     elif "." not in word:
@@ -59,7 +79,9 @@ def parse_token_as_op(token):
 
 def parse_program_from_file(input_file_path):
     with open(input_file_path, "r") as file:
-        return[parse_token_as_op(token) for token in parse_tokens_from_file(input_file_path)]
+        return generate_blocks(
+                    [parse_token_as_op(token) for token in parse_tokens_from_file(input_file_path)]
+                )
 
 def parse_tokens_from_file(input_file_path):
     with open(input_file_path, "r") as file:
@@ -78,3 +100,15 @@ def find_next(line, start, predicate):
     while start < len(line) and not predicate(line[start]):
         start += 1
     return start
+
+def generate_blocks(program):
+    block = []
+    for ip in range(len(program)):
+        assert cfg.OP_COUNT == 13, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        if program[ip][0] == cfg.OP_IF:
+            block.append(ip)
+        if program[ip][0] == cfg.OP_END:
+            ref = block.pop()
+            program[ref] = (cfg.OP_IF,  ip)
+            program[ip]  = (cfg.OP_END, ip)
+    return program

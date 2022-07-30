@@ -41,32 +41,31 @@ _start:
     pop rax
     pop rbx
     cmp rbx, rax
-    cmovge rcx, rdx
+    cmovg rcx, rdx
     push rcx
+    pop rax
+    test rax, rax
+    jz addr_13
+    push 69
     pop rdi
     call dump
-    push 13
+    push 14
     push 13
     mov rcx, 0
     mov rdx, 1
     pop rax
     pop rbx
     cmp rbx, rax
-    cmovge rcx, rdx
+    cmovl rcx, rdx
     push rcx
-    pop rdi
-    call dump
-    push 12
-    push 13
-    mov rcx, 0
-    mov rdx, 1
     pop rax
-    pop rbx
-    cmp rbx, rax
-    cmovge rcx, rdx
-    push rcx
+    test rax, rax
+    jz addr_12
+    push 42
     pop rdi
     call dump
+addr_12:
+addr_13:
     mov rax, 60
     mov rdi, 0
     syscall
