@@ -50,36 +50,20 @@ _start:
     push rcx
     pop rdi
     call dump
-    push 3
-    push 23
+    push 1
+    push 13
     pop rax
     pop rbx
-    imul rbx
+    add rax, rbx
     push rax
-    pop rdi
-    call dump
-    push 10
-    push 10
+    push 26
+    mov rcx, 0
+    mov rdx, 1
     pop rax
     pop rbx
-    imul rbx
-    push rax
-    pop rdi
-    call dump
-    push 0
-    push 9
-    pop rax
-    pop rbx
-    imul rbx
-    push rax
-    pop rdi
-    call dump
-    push -1
-    push 9
-    pop rax
-    pop rbx
-    imul rbx
-    push rax
+    cmp rax, rbx
+    cmove rcx, rdx
+    push rcx
     pop rdi
     call dump
     mov rax, 60

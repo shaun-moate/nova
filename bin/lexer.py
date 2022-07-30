@@ -17,20 +17,25 @@ def multiply():
 def equal():
     return (cfg.OP_EQUAL, )
 
+def not_equal():
+    return (cfg.OP_NOTEQUAL, )
+
 def dump():
     return (cfg.OP_DUMP, )
 
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
-    assert cfg.OP_COUNT == 6, "Exhaustive list of operands in emulate_program()"
+    assert cfg.OP_COUNT == 7, "Exhaustive list of operands in emulate_program()"
     if word == "+":
         return plus()
     elif word == "-":
         return minus()
     elif word == "*":
         return multiply()
-    elif word == "=":
+    elif word == "==":
         return equal()
+    elif word == "!=":
+        return not_equal()
     elif word == "print":
         return dump()
     elif "." not in word:
