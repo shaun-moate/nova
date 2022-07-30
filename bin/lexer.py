@@ -11,6 +11,9 @@ def plus():
 def minus():
     return (cfg.OP_MINUS, )
 
+def multiply():
+    return (cfg.OP_MULT, )
+
 def equal():
     return (cfg.OP_EQUAL, )
 
@@ -19,11 +22,13 @@ def dump():
 
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
-    assert cfg.OP_COUNT == 5, "Exhaustive list of operands in emulate_program()"
+    assert cfg.OP_COUNT == 6, "Exhaustive list of operands in emulate_program()"
     if word == "+":
         return plus()
     elif word == "-":
         return minus()
+    elif word == "*":
+        return multiply()
     elif word == "=":
         return equal()
     elif word == "print":

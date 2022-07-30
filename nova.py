@@ -10,6 +10,7 @@ from bin.lexer import parse_program_from_file
 cfg.OP_PUSH      = iota(True)
 cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
+cfg.OP_MULT      = iota()
 cfg.OP_EQUAL     = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
@@ -17,7 +18,7 @@ cfg.OP_COUNT     = iota()
 def simulate_program(program):
     stack = []
     for op in program:
-        assert cfg.OP_COUNT == 5, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 6, "Exhaustive list of operands in simulate_program()"
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
         elif op[0] == cfg.OP_PLUS:
@@ -28,6 +29,10 @@ def simulate_program(program):
             x = stack.pop()
             y = stack.pop()
             stack.append(y - x)
+        elif op[0] == cfg.OP_MULT:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(x * y)
         elif op[0] == cfg.OP_EQUAL:
             x = stack.pop()
             y = stack.pop()
@@ -78,13 +83,15 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for op in program:
-            assert cfg.OP_COUNT == 5, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 6, "Exhaustive list of operands in compile_program()"
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
                 out.write("    pop rax\n    pop rbx\n    add rax, rbx\n    push rax\n")
             elif op[0] == cfg.OP_MINUS:
                 out.write("    pop rax\n    pop rbx\n    sub rbx, rax\n    push rbx\n")
+            elif op[0] == cfg.OP_MULT:
+                out.write("    pop rax\n    pop rbx\n    mul rbx\n    push rax\n")
             elif op[0] == cfg.OP_EQUAL:
                 out.write("    mov rcx, 0\n    mov rdx, 1\n    pop rax\n    pop rbx\n    cmp rax, rbx\n    cmove rcx, rdx\n    push rcx\n")
             elif op[0] == cfg.OP_DUMP:
