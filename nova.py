@@ -87,18 +87,36 @@ def compile_program(program):
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
-                out.write("    pop rax\n    pop rbx\n    add rax, rbx\n    push rax\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    add rax, rbx\n")
+                out.write("    push rax\n")
             elif op[0] == cfg.OP_MINUS:
-                out.write("    pop rax\n    pop rbx\n    sub rbx, rax\n    push rbx\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    sub rbx, rax\n")
+                out.write("    push rbx\n")
             elif op[0] == cfg.OP_MULT:
-                out.write("    pop rax\n    pop rbx\n    mul rbx\n    push rax\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    mul rbx\n")
+                out.write("    push rax\n")
             elif op[0] == cfg.OP_EQUAL:
-                out.write("    mov rcx, 0\n    mov rdx, 1\n    pop rax\n    pop rbx\n    cmp rax, rbx\n    cmove rcx, rdx\n    push rcx\n")
+                out.write("    mov rcx, 0\n")
+                out.write("    mov rdx, 1\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    cmp rax, rbx\n")
+                out.write("    cmove rcx, rdx\n")
+                out.write("    push rcx\n")
             elif op[0] == cfg.OP_DUMP:
-                out.write("    pop rdi\n    call dump\n")
+                out.write("    pop rdi\n")
+                out.write("    call dump\n")
             else:
                 assert False, "Operands is unreachable"
-        out.write("    mov rax, 60\n    mov rdi, 0\n    syscall")
+        out.write("    mov rax, 60\n")
+        out.write("    mov rdi, 0\n")
+        out.write("    syscall\n")
         out.close()
         call_cmd()
 
