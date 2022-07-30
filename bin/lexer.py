@@ -20,12 +20,18 @@ def equal():
 def not_equal():
     return (cfg.OP_NOTEQUAL, )
 
+def greater_than():
+    return (cfg.OP_GREATER, )
+
+def greater_than_or_equal():
+    return (cfg.OP_GR_EQ, )
+
 def dump():
     return (cfg.OP_DUMP, )
 
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
-    assert cfg.OP_COUNT == 7, "Exhaustive list of operands in emulate_program()"
+    assert cfg.OP_COUNT == 9, "Exhaustive list of operands in emulate_program()"
     if word == "+":
         return plus()
     elif word == "-":
@@ -36,6 +42,10 @@ def parse_token_as_op(token):
         return equal()
     elif word == "!=":
         return not_equal()
+    elif word == ">=":
+        return greater_than_or_equal()
+    elif word == ">":
+        return greater_than()
     elif word == "print":
         return dump()
     elif "." not in word:

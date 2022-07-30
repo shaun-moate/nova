@@ -12,14 +12,16 @@ cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
 cfg.OP_MULT      = iota()
 cfg.OP_EQUAL     = iota()
-cfg.OP_NOTEQUAL  = iota()
+cfg.OP_NOT_EQUAL = iota()
+cfg.OP_GREATER   = iota()
+cfg.OP_GR_EQ     = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
 
 def simulate_program(program):
     stack = []
     for op in program:
-        assert cfg.OP_COUNT == 7, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 9, "Exhaustive list of operands in simulate_program()"
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
         elif op[0] == cfg.OP_PLUS:
@@ -33,15 +35,23 @@ def simulate_program(program):
         elif op[0] == cfg.OP_MULT:
             x = stack.pop()
             y = stack.pop()
-            stack.append(x * y)
+            stack.append(y * x)
         elif op[0] == cfg.OP_EQUAL:
             x = stack.pop()
             y = stack.pop()
-            stack.append(y == x)
-        elif op[0] == cfg.OP_NOTEQUAL:
+            stack.append(int(y == x))
+        elif op[0] == cfg.OP_NOT_EQUAL:
             x = stack.pop()
             y = stack.pop()
-            stack.append(y != x)
+            stack.append(int(y != x))
+        elif op[0] == cfg.OP_GREATER:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(int(y > x))
+        elif op[0] == cfg.OP_GR_EQ:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(int(y >= x))
         elif op[0] == cfg.OP_DUMP:
             x = stack.pop()
             print(x)
@@ -88,7 +98,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for op in program:
-            assert cfg.OP_COUNT == 7, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 9, "Exhaustive list of operands in compile_program()"
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
@@ -114,13 +124,29 @@ def compile_program(program):
                 out.write("    cmp rax, rbx\n")
                 out.write("    cmove rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op[0] == cfg.OP_NOTEQUAL:
+            elif op[0] == cfg.OP_NOT_EQUAL:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    cmp rax, rbx\n")
                 out.write("    cmovne rcx, rdx\n")
+                out.write("    push rcx\n")
+            elif op[0] == cfg.OP_GREATER:
+                out.write("    mov rcx, 0\n")
+                out.write("    mov rdx, 1\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    cmp rbx, rax\n")
+                out.write("    cmovg rcx, rdx\n")
+                out.write("    push rcx\n")
+            elif op[0] == cfg.OP_GR_EQ:
+                out.write("    mov rcx, 0\n")
+                out.write("    mov rdx, 1\n")
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    cmp rbx, rax\n")
+                out.write("    cmovge rcx, rdx\n")
                 out.write("    push rcx\n")
             elif op[0] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")

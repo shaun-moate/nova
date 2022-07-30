@@ -34,35 +34,36 @@ dump:
     ret
 global _start
 _start:
+    push 14
     push 13
-    push 13
-    pop rax
-    pop rbx
-    add rax, rbx
-    push rax
-    push 26
     mov rcx, 0
     mov rdx, 1
     pop rax
     pop rbx
-    cmp rax, rbx
-    cmove rcx, rdx
+    cmp rbx, rax
+    cmovge rcx, rdx
     push rcx
     pop rdi
     call dump
-    push 1
     push 13
-    pop rax
-    pop rbx
-    add rax, rbx
-    push rax
-    push 26
+    push 13
     mov rcx, 0
     mov rdx, 1
     pop rax
     pop rbx
-    cmp rax, rbx
-    cmove rcx, rdx
+    cmp rbx, rax
+    cmovge rcx, rdx
+    push rcx
+    pop rdi
+    call dump
+    push 12
+    push 13
+    mov rcx, 0
+    mov rdx, 1
+    pop rax
+    pop rbx
+    cmp rbx, rax
+    cmovge rcx, rdx
     push rcx
     pop rdi
     call dump
