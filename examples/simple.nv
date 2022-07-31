@@ -1,9 +1,5 @@
-14 13 != if
-    1 if
-      13 print
-    else
-      999 print
-    end
-else
-    420 print
+10
+while dup 0 > do
+  dup 2 * print
+  1 -
 end

@@ -32,21 +32,30 @@ def less_than():
 def less_than_or_equal():
     return (cfg.OP_LESS_EQ, )
 
-def iff():
+def if_f():
     return (cfg.OP_IF, )
 
-def elsef():
+def else_f():
     return (cfg.OP_ELSE, )
 
 def end():
     return (cfg.OP_END, )
+
+def while_f():
+    return (cfg.OP_WHILE, )
+
+def do_f():
+    return (cfg.OP_DO, )
+
+def duplicate():
+    return (cfg.OP_DUPLICATE, )
 
 def dump():
     return (cfg.OP_DUMP, )
 
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
-    assert cfg.OP_COUNT == 14, "Exhaustive list of operands in parse_token_as_op()"
+    assert cfg.OP_COUNT == 17, "Exhaustive list of operands in parse_token_as_op()"
     if word == "+":
         return plus()
     elif word == "-":
@@ -66,11 +75,17 @@ def parse_token_as_op(token):
     elif word == "<=":
         return less_than_or_equal()
     elif word == "if":
-        return iff()
+        return if_f()
     elif word == "else":
-        return elsef()
+        return else_f()
     elif word == "end":
         return end()
+    elif word == "while":
+        return while_f()
+    elif word == "do":
+        return do_f()
+    elif word == "dup":
+        return duplicate()
     elif word == "print":
         return dump()
     elif "." not in word:
@@ -109,15 +124,28 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert cfg.OP_COUNT == 14, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert cfg.OP_COUNT == 17, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip][0] == cfg.OP_IF:
             block.append(ip)
         if program[ip][0] == cfg.OP_ELSE:
             ref = block.pop()
             assert program[ref][0] == cfg.OP_IF, "ERROR: 'else' can only be used in 'if' blocks"
-            program[ref] = (cfg.OP_IF,  ip+1)
+            program[ref] = (cfg.OP_IF, ip+1)
+            block.append(ip)
+        if program[ip][0] == cfg.OP_WHILE:
+            block.append(ip)
+        if program[ip][0] == cfg.OP_DO:
+            ref = block.pop()
+            assert program[ref][0] == cfg.OP_WHILE, "ERROR: 'do' can only be used in 'while' blocks"
+            program[ip] = (cfg.OP_DO, ref)
             block.append(ip)
         if program[ip][0] == cfg.OP_END:
             ref = block.pop()
-            program[ref] = (program[ref][0],  ip)
+            if program[ref][0] == cfg.OP_IF or program[ref][0] == cfg.OP_ELSE:
+                program[ip] = (cfg.OP_END, ip+1)
+                program[ref] = (program[ref][0], ip)
+            elif program[ref][0] == cfg.OP_DO:
+                program[ip] = (cfg.OP_END, program[ref][1])
+                program[ref] = (cfg.OP_DO, ip+1)
+
     return program

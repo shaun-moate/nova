@@ -20,6 +20,9 @@ cfg.OP_LESS_EQ   = iota()
 cfg.OP_IF        = iota()
 cfg.OP_ELSE      = iota()
 cfg.OP_END       = iota()
+cfg.OP_WHILE     = iota()
+cfg.OP_DO        = iota()
+cfg.OP_DUPLICATE = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
 
@@ -27,7 +30,7 @@ def simulate_program(program):
     stack = []
     ip = 0
     while ip < len(program):
-        assert cfg.OP_COUNT == 14, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 17, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
@@ -86,8 +89,21 @@ def simulate_program(program):
         elif op[0] == cfg.OP_ELSE:
             assert len(op) > 1, "ERROR: 'else' block has no referenced 'end'"
             ip = op[1]
-        elif op[0] == cfg.OP_END:
+        elif op[0] == cfg.OP_WHILE:
             ip += 1
+        elif op[0] == cfg.OP_DO:
+            assert len(op) > 1, "ERROR: 'do' block has no referenced 'end'"
+            if stack.pop() == 0:
+                ip = op[1]
+            else:
+                ip += 1
+        elif op[0] == cfg.OP_DUPLICATE:
+            x = stack.pop()
+            stack.append(x)
+            stack.append(x)
+            ip += 1
+        elif op[0] == cfg.OP_END:
+            ip = op[1]
         elif op[0] == cfg.OP_DUMP:
             x = stack.pop()
             print(x)
@@ -135,8 +151,9 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 14, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 17, "Exhaustive list of operands in compile_program()"
             op = program[ip]
+            out.write("addr_%d:\n" % ip)
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
@@ -208,16 +225,26 @@ def compile_program(program):
                 out.write("    test rax, rax\n")
                 out.write("    jz addr_%d\n" % op[1])
             elif op[0] == cfg.OP_ELSE:
-                out.write("addr_%d:\n" % ip)
                 out.write("    jmp addr_%d\n" % op[1])
-                out.write("addr_%s:\n" % (ip+1))
+            elif op[0] == cfg.OP_WHILE:
+                pass
+            elif op[0] == cfg.OP_DO:
+                assert len(op) > 1, "ERROR: 'do' block has no referenced 'end'"
+                out.write("    pop rax\n")
+                out.write("    test rax, rax\n")
+                out.write("    jz addr_%d\n" % op[1])
+            elif op[0] == cfg.OP_DUPLICATE:
+                out.write("    pop rax\n")
+                out.write("    push rax\n")
+                out.write("    push rax\n")
             elif op[0] == cfg.OP_END:
-                out.write("addr_%d:\n" % ip)
+                out.write("    jmp addr_%d\n" % op[1])
             elif op[0] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")
             else:
                 assert False, "Operands is unreachable"
+        out.write("addr_%d:\n" % len(program))
         out.write("    mov rax, 60\n")
         out.write("    mov rdi, 0\n")
         out.write("    syscall")
