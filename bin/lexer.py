@@ -107,7 +107,7 @@ def parse_tokens_from_file(input_file_path):
     with open(input_file_path, "r") as file:
         return [(input_file_path, row+1, col+1, token)
                 for (row, line) in enumerate(file.readlines())
-                for (col, token) in parse_line(line)]
+                for (col, token) in parse_line(line.split("##")[0])]
 
 def parse_line(line):
     start = find_next(line, 0, lambda x: not x.isspace())
