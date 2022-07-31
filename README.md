@@ -3,14 +3,146 @@ My own effort to create stack-based (& compiled) language.  Simply an excuse to 
 
 IT IS heavily inspired by Porth (tsoding)! 
 
-## How to use
+## Getting Started
 You can either simulate the code OR compile to an executable (output).  The executable is written in Assembly.  The simulation is done using python3.
 ``` sh
 ./nova.py --help
 ./nova.py --simulate (-s) <file>
 ./nova.py --compile  (-c) <file>
-build/output
 ```
 
-## TODO
- - Improve Lexer to enable better debugging (ie. showing where error is occurring)
+
+## Simple Examples
+Some quick and easy examples to demonstrate the language of Nova. It's not perfect (yet) but it can get the job done!
+
+ - Implement an 'if' and 'else' statement
+    ``` forth
+    10 10 == if
+        69 print
+    else 
+        96 print
+    end
+    ```
+
+ - Count down from 10 with a 'while' loop
+    ``` forth
+    10 
+    do dup 0 < while
+        dup print
+        1 -
+    end
+    ```
+
+## Documentation
+List of keywords and operators for the language of Nova.  Work in progress!
+
+ - (integer) : any integer that is found is pushed to the stack
+    ```python
+    stack.append(a)
+    ```
+
+ - dup : this key word will duplicate the value at the top of the stack
+    ```python
+    a = stack.pop()
+    stack.append(a)
+    stack.append(a)
+    ```
+    
+ - + : will take the top 2 items from the stack and add them, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(a + b)
+    ```
+ 
+ - - : will take the top 2 items from the stack and subtract them, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b + a)
+    ```
+ 
+ - * : will take the top 2 items from the stack and multiply them, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b * a)
+    ```
+
+ - == : will take the top 2 items from the stack and check if they are equal, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(int(b == a))
+    ```
+
+ - != : will take the top 2 items from the stack and check if they are NOT equal, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(int(b != a))
+    ```
+
+ - > : will take the top 2 items from the stack and check if b is greater than a, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(int(b > a))
+    ```
+
+ - >= : will take the top 2 items from the stack and check if b is greater than or equal to a, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(int(b >= a))
+    ```
+
+ - < : will take the top 2 items from the stack and check if b is less than a, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(int(b < a))
+    ```
+
+ - <= : will take the top 2 items from the stack and check if b is less than or equal to a, placing the result back on top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(int(b <= a))
+    ```
+
+ - if : will take the top item from the stack (expecting 1 or 0), where if value is 1 it will continue to execute, however if value is 0 is will skip to 'else' or 'end' 
+    ```python
+    a = stack.pop()
+    if a == 0:
+        // move into the 'else' block (passing by the 'else' statement) or skips to 'end'
+    else:
+        // continue into the block of code
+    ```
+
+ - else : else acts as a marker to simply skip to the 'end', noting an 'if' moving towards the 'else' is skipping to the 1st instruction in the 'else' block
+    ```python
+       // skip to the 'end' of the if statement
+    ```
+
+ - do : acts as a marker for the 'end' of a 'while' loop, indicating where the 'end' should iterate back to if the 'while' condition remains true
+    ```python
+       // a marker only for the 'while' loop
+    ```
+
+ - while : will take the top item from the stack (expecting 1 or 0), where if value is 1 it will continue to execute, however if value is 0 is will skip to 1 instruction past the 'end' statement
+    ```python
+    a = stack.pop()
+    if a == 0:
+        // move into the 1 instruction past the 'end'
+    else:
+        // continue into the block of code
+    ```
+    
+ - end : acts as a marker to the conclusion of the 'if' or 'while' blocks, depnding on which block it takes seperate actions
+    ```python
+    if loop_type == 'if':
+        pass
+    elif loop_type == 'while':
+        // move back to the 'do' statement to re-evaluate whether 'while' condition remains to be true
+    ```
