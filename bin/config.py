@@ -13,6 +13,7 @@ OP_GR_EQ     = 0
 OP_LESSER    = 0
 OP_LESS_EQ   = 0
 OP_IF        = 0
+OP_ELSE      = 0
 OP_END       = 0
 OP_DUMP      = 0
 OP_COUNT     = 0

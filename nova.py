@@ -18,6 +18,7 @@ cfg.OP_GR_EQ     = iota()
 cfg.OP_LESSER    = iota()
 cfg.OP_LESS_EQ   = iota()
 cfg.OP_IF        = iota()
+cfg.OP_ELSE      = iota()
 cfg.OP_END       = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
@@ -26,7 +27,7 @@ def simulate_program(program):
     stack = []
     ip = 0
     while ip < len(program):
-        assert cfg.OP_COUNT == 13, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 14, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
@@ -77,11 +78,14 @@ def simulate_program(program):
             stack.append(int(y <= x))
             ip += 1
         elif op[0] == cfg.OP_IF:
-            assert len(op) > 1, "ERROR: 'if' block has no referenced 'end'"
+            assert len(op) > 1, "ERROR: 'if' block has no referenced 'else' or 'end'"
             if stack.pop() == 0:
                 ip = op[1]
             else:
                 ip += 1
+        elif op[0] == cfg.OP_ELSE:
+            assert len(op) > 1, "ERROR: 'else' block has no referenced 'end'"
+            ip = op[1]
         elif op[0] == cfg.OP_END:
             ip += 1
         elif op[0] == cfg.OP_DUMP:
@@ -130,8 +134,9 @@ def compile_program(program):
         out.write("    ret\n")
 
         out.write("global _start\n_start:\n")
-        for op in program:
-            assert cfg.OP_COUNT == 13, "Exhaustive list of operands in compile_program()"
+        for ip in range(len(program)):
+            assert cfg.OP_COUNT == 14, "Exhaustive list of operands in compile_program()"
+            op = program[ip]
             if op[0] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op[1])
             elif op[0] == cfg.OP_PLUS:
@@ -202,8 +207,12 @@ def compile_program(program):
                 out.write("    pop rax\n")
                 out.write("    test rax, rax\n")
                 out.write("    jz addr_%d\n" % op[1])
+            elif op[0] == cfg.OP_ELSE:
+                out.write("addr_%d:\n" % ip)
+                out.write("    jmp addr_%d\n" % op[1])
+                out.write("addr_%s:\n" % (ip+1))
             elif op[0] == cfg.OP_END:
-                out.write("addr_%d:\n" % op[1])
+                out.write("addr_%d:\n" % ip)
             elif op[0] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")

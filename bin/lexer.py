@@ -18,7 +18,7 @@ def equal():
     return (cfg.OP_EQUAL, )
 
 def not_equal():
-    return (cfg.OP_NOTEQUAL, )
+    return (cfg.OP_NOT_EQUAL, )
 
 def greater_than():
     return (cfg.OP_GREATER, )
@@ -35,6 +35,9 @@ def less_than_or_equal():
 def iff():
     return (cfg.OP_IF, )
 
+def elsef():
+    return (cfg.OP_ELSE, )
+
 def end():
     return (cfg.OP_END, )
 
@@ -43,7 +46,7 @@ def dump():
 
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
-    assert cfg.OP_COUNT == 13, "Exhaustive list of operands in parse_token_as_op()"
+    assert cfg.OP_COUNT == 14, "Exhaustive list of operands in parse_token_as_op()"
     if word == "+":
         return plus()
     elif word == "-":
@@ -64,6 +67,8 @@ def parse_token_as_op(token):
         return less_than_or_equal()
     elif word == "if":
         return iff()
+    elif word == "else":
+        return elsef()
     elif word == "end":
         return end()
     elif word == "print":
@@ -104,11 +109,15 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert cfg.OP_COUNT == 13, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert cfg.OP_COUNT == 14, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip][0] == cfg.OP_IF:
+            block.append(ip)
+        if program[ip][0] == cfg.OP_ELSE:
+            ref = block.pop()
+            assert program[ref][0] == cfg.OP_IF, "ERROR: 'else' can only be used in 'if' blocks"
+            program[ref] = (cfg.OP_IF,  ip+1)
             block.append(ip)
         if program[ip][0] == cfg.OP_END:
             ref = block.pop()
-            program[ref] = (cfg.OP_IF,  ip)
-            program[ip]  = (cfg.OP_END, ip)
+            program[ref] = (program[ref][0],  ip)
     return program
