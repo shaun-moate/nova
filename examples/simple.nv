@@ -1,5 +1,5 @@
 10
-while dup 0 > do
+do dup 0 > while
   dup 2 * print
   1 -
 end

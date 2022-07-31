@@ -29,11 +29,17 @@ cfg.OP_COUNT     = iota()
 def simulate_program(program):
     stack = []
     ip = 0
+    print("RESULTS:-----------------------------------")
     while ip < len(program):
         assert cfg.OP_COUNT == 17, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op[0] == cfg.OP_PUSH:
             stack.append(op[1])
+            ip += 1
+        elif op[0] == cfg.OP_DUPLICATE:
+            x = stack.pop()
+            stack.append(x)
+            stack.append(x)
             ip += 1
         elif op[0] == cfg.OP_PLUS:
             x = stack.pop()
@@ -89,19 +95,14 @@ def simulate_program(program):
         elif op[0] == cfg.OP_ELSE:
             assert len(op) > 1, "ERROR: 'else' block has no referenced 'end'"
             ip = op[1]
-        elif op[0] == cfg.OP_WHILE:
-            ip += 1
         elif op[0] == cfg.OP_DO:
+            ip += 1
+        elif op[0] == cfg.OP_WHILE:
             assert len(op) > 1, "ERROR: 'do' block has no referenced 'end'"
             if stack.pop() == 0:
                 ip = op[1]
             else:
                 ip += 1
-        elif op[0] == cfg.OP_DUPLICATE:
-            x = stack.pop()
-            stack.append(x)
-            stack.append(x)
-            ip += 1
         elif op[0] == cfg.OP_END:
             ip = op[1]
         elif op[0] == cfg.OP_DUMP:
@@ -110,6 +111,7 @@ def simulate_program(program):
             ip += 1
         else:
             assert False, "Operands is unreachable"
+    print("-------------------------------------------")
 
 def compile_program(program):
     with open("build/output.asm", "w") as out:
@@ -160,6 +162,10 @@ def compile_program(program):
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    add rax, rbx\n")
+                out.write("    push rax\n")
+            elif op[0] == cfg.OP_DUPLICATE:
+                out.write("    pop rax\n")
+                out.write("    push rax\n")
                 out.write("    push rax\n")
             elif op[0] == cfg.OP_MINUS:
                 out.write("    pop rax\n")
@@ -226,17 +232,13 @@ def compile_program(program):
                 out.write("    jz addr_%d\n" % op[1])
             elif op[0] == cfg.OP_ELSE:
                 out.write("    jmp addr_%d\n" % op[1])
-            elif op[0] == cfg.OP_WHILE:
-                pass
             elif op[0] == cfg.OP_DO:
+                pass
+            elif op[0] == cfg.OP_WHILE:
                 assert len(op) > 1, "ERROR: 'do' block has no referenced 'end'"
                 out.write("    pop rax\n")
                 out.write("    test rax, rax\n")
                 out.write("    jz addr_%d\n" % op[1])
-            elif op[0] == cfg.OP_DUPLICATE:
-                out.write("    pop rax\n")
-                out.write("    push rax\n")
-                out.write("    push rax\n")
             elif op[0] == cfg.OP_END:
                 out.write("    jmp addr_%d\n" % op[1])
             elif op[0] == cfg.OP_DUMP:
@@ -257,8 +259,8 @@ def call_cmd():
     subprocess.call(["nasm", "-felf64", "build/output.asm"])
     print("run: ld -o build/output build/output.o")
     subprocess.call(["ld", "-o", "build/output", "build/output.o"])
-    print("RESULTS:-----------------------------------")
     print("run: build/output")
+    print("RESULTS:-----------------------------------")
     subprocess.call(["build/output"])
     print("-------------------------------------------")
 

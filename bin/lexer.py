@@ -132,20 +132,20 @@ def generate_blocks(program):
             assert program[ref][0] == cfg.OP_IF, "ERROR: 'else' can only be used in 'if' blocks"
             program[ref] = (cfg.OP_IF, ip+1)
             block.append(ip)
-        if program[ip][0] == cfg.OP_WHILE:
-            block.append(ip)
         if program[ip][0] == cfg.OP_DO:
+            block.append(ip)
+        if program[ip][0] == cfg.OP_WHILE:
             ref = block.pop()
-            assert program[ref][0] == cfg.OP_WHILE, "ERROR: 'do' can only be used in 'while' blocks"
-            program[ip] = (cfg.OP_DO, ref)
+            assert program[ref][0] == cfg.OP_DO, "ERROR: 'do' can only be used in 'while' blocks"
+            program[ip] = (cfg.OP_WHILE, ref)
             block.append(ip)
         if program[ip][0] == cfg.OP_END:
             ref = block.pop()
             if program[ref][0] == cfg.OP_IF or program[ref][0] == cfg.OP_ELSE:
                 program[ip] = (cfg.OP_END, ip+1)
                 program[ref] = (program[ref][0], ip)
-            elif program[ref][0] == cfg.OP_DO:
+            elif program[ref][0] == cfg.OP_WHILE:
                 program[ip] = (cfg.OP_END, program[ref][1])
-                program[ref] = (cfg.OP_DO, ip+1)
+                program[ref] = (cfg.OP_WHILE, ip+1)
 
     return program
