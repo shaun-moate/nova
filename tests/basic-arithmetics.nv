@@ -1,0 +1,8 @@
+## -- Addition --
+34 35 + print
+
+## -- Subtraction --
+500 80 - print
+
+## -- Multiplication --
+7 6 * print
