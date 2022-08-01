@@ -1,0 +1,11 @@
+## -- Basic 'if' statement --
+34 35 + 69 == if
+   420 print
+end
+
+## -- Basic 'if-else' statement --
+34 35 + 69 != if
+   420 print
+else
+   69 print
+end

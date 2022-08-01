@@ -1,0 +1,17 @@
+## -- Greater than --
+69 420 > print
+
+## -- Greater than or equal to --
+69 420 >= print
+
+## -- Less than --
+69 420 < print
+
+## -- Less than or equal to --
+69 420 <= print
+
+## -- Equal --
+69 420 == print
+
+## -- Not Equal --
+69 420 != print

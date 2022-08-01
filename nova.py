@@ -260,8 +260,6 @@ def call_cmd():
     print("run: ld -o build/output build/output.o")
     subprocess.call(["ld", "-o", "build/output", "build/output.o"])
     print("run: build/output")
-    print("RESULTS:-----------------------------------")
-    subprocess.call(["build/output"])
     print("-------------------------------------------")
 
 if __name__ == '__main__':

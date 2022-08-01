@@ -1,0 +1,5 @@
+## -- Basic 'while' loop
+69 do dup 0 > while
+   dup print
+   1 -
+end
