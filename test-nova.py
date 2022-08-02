@@ -43,11 +43,12 @@ def run_test_case(input_file_path: str):
    global SUCCESS
    global FAIL
    global FAILURE_LIST
+   print("[INFO] running test case: %s == %s" % (input_file_path, str(input_file_path[:-len(NOVA_EXT)])))
    if compile_test_case(input_file_path) == load_test_case(input_file_path):
-      print("[PASS] test case concluded: %s" % (input_file_path))
+      print("[PASS] test case PASSED: %s" % (input_file_path))
       SUCCESS += 1
    else:
-      print("[FAIL] test case failed: %s" % (input_file_path))
+      print("[FAIL] test case FAILED: %s" % (input_file_path))
       FAIL += 1
       FAILURE_LIST.append(input_file_path)
 

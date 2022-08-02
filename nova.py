@@ -278,12 +278,20 @@ if __name__ == '__main__':
         program = parse_program_from_file(input_file_path)
         simulate_program(program)
     elif subcommand == "--compile" or subcommand == "-c":
-        if len(argv) < 1:
+        if len(argv) > 1:
+            (option, argv) = uncons(argv)
+            if option == "--run" or option == "-r":
+                (input_file_path, argv) = uncons(argv)
+                program = parse_program_from_file(input_file_path)
+                compile_program(program)
+                subprocess.call(["build/output"])
+        elif len(argv) <= 1:
+            (input_file_path, argv) = uncons(argv)
+            program = parse_program_from_file(input_file_path)
+        elif len(argv) < 1:
             print("ERROR: no input file provided to compilation")
             usage(program)
-        (input_file_path, argv) = uncons(argv)
-        program = parse_program_from_file(input_file_path)
-        compile_program(program)
+            compile_program(program)
     elif subcommand == "--help":
         usage(program)
     else:

@@ -35,73 +35,43 @@ dump:
 global _start
 _start:
 addr_0:
-    push 34
+    push 69
 addr_1:
-    push 35
 addr_2:
     pop rax
-    pop rbx
-    add rax, rbx
+    push rax
     push rax
 addr_3:
-    push 69
+    push 0
 addr_4:
     mov rcx, 0
     mov rdx, 1
     pop rax
     pop rbx
-    cmp rax, rbx
-    cmove rcx, rdx
+    cmp rbx, rax
+    cmovg rcx, rdx
     push rcx
 addr_5:
     pop rax
     test rax, rax
-    jz addr_8
+    jz addr_11
 addr_6:
-    push 420
+    pop rax
+    push rax
+    push rax
 addr_7:
     pop rdi
     call dump
 addr_8:
-    jmp addr_9
+    push 1
 addr_9:
-    push 34
+    pop rax
+    pop rbx
+    sub rbx, rax
+    push rbx
 addr_10:
-    push 35
+    jmp addr_1
 addr_11:
-    pop rax
-    pop rbx
-    add rax, rbx
-    push rax
-addr_12:
-    push 69
-addr_13:
-    mov rcx, 0
-    mov rdx, 1
-    pop rax
-    pop rbx
-    cmp rax, rbx
-    cmovne rcx, rdx
-    push rcx
-addr_14:
-    pop rax
-    test rax, rax
-    jz addr_18
-addr_15:
-    push 420
-addr_16:
-    pop rdi
-    call dump
-addr_17:
-    jmp addr_20
-addr_18:
-    push 69
-addr_19:
-    pop rdi
-    call dump
-addr_20:
-    jmp addr_21
-addr_21:
     mov rax, 60
     mov rdi, 0
     syscall
