@@ -147,5 +147,4 @@ def generate_blocks(program):
             elif program[ref][0] == cfg.OP_WHILE:
                 program[ip] = (cfg.OP_END, program[ref][1])
                 program[ref] = (cfg.OP_WHILE, ip+1)
-
     return program
