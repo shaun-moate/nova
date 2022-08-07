@@ -2,97 +2,47 @@
 
 import bin.config as cfg
 
-def push(value):
-    return (cfg.OP_PUSH, value)
-
-def plus():
-    return (cfg.OP_PLUS, )
-
-def minus():
-    return (cfg.OP_MINUS, )
-
-def multiply():
-    return (cfg.OP_MULT, )
-
-def equal():
-    return (cfg.OP_EQUAL, )
-
-def not_equal():
-    return (cfg.OP_NOT_EQUAL, )
-
-def greater_than():
-    return (cfg.OP_GREATER, )
-
-def greater_than_or_equal():
-    return (cfg.OP_GR_EQ, )
-
-def less_than():
-    return (cfg.OP_LESSER, )
-
-def less_than_or_equal():
-    return (cfg.OP_LESS_EQ, )
-
-def if_f():
-    return (cfg.OP_IF, )
-
-def else_f():
-    return (cfg.OP_ELSE, )
-
-def end():
-    return (cfg.OP_END, )
-
-def while_f():
-    return (cfg.OP_WHILE, )
-
-def do_f():
-    return (cfg.OP_DO, )
-
-def duplicate():
-    return (cfg.OP_DUPLICATE, )
-
-def dump():
-    return (cfg.OP_DUMP, )
-
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
+    location = (file_path, row+1, col+1, word)
     assert cfg.OP_COUNT == 17, "Exhaustive list of operands in parse_token_as_op()"
     if word == "+":
-        return plus()
+        return {'action': cfg.OP_PLUS, 'location': location}
     elif word == "-":
-        return minus()
+        return {'action': cfg.OP_MINUS, 'location': location}
     elif word == "*":
-        return multiply()
+        return {'action': cfg.OP_MULT, 'location': location}
     elif word == "==":
-        return equal()
+        return {'action': cfg.OP_EQUAL, 'location': location}
     elif word == "!=":
-        return not_equal()
+        return {'action': cfg.OP_NOT_EQUAL, 'location': location}
     elif word == ">":
-        return greater_than()
+        return {'action': cfg.OP_GREATER, 'location': location}
     elif word == ">=":
-        return greater_than_or_equal()
+        return {'action': cfg.OP_GR_EQ, 'location': location}
     elif word == "<":
-        return less_than()
+        return {'action': cfg.OP_LESSER, 'location': location}
     elif word == "<=":
-        return less_than_or_equal()
+        return {'action': cfg.OP_LESS_EQ, 'location': location}
     elif word == "if":
-        return if_f()
+        return {'action': cfg.OP_IF, 'location': location, 'jump_to': 0}
     elif word == "else":
-        return else_f()
+        return {'action': cfg.OP_ELSE, 'location': location, 'jump_to': 0}
     elif word == "end":
-        return end()
+        return {'action': cfg.OP_END, 'location': location, 'jump_to': 0}
     elif word == "while":
-        return while_f()
+        return {'action': cfg.OP_WHILE, 'location': location, 'jump_to': 0}
     elif word == "do":
-        return do_f()
+        return {'action': cfg.OP_DO, 'location': location, 'jump_to': 0}
     elif word == "dup":
-        return duplicate()
+        return {'action': cfg.OP_DUPLICATE, 'location': location}
     elif word == "print":
-        return dump()
+        return {'action': cfg.OP_DUMP, 'location': location}
     elif "." not in word:
         try:
-            return push(int(word))
+            return {'action': cfg.OP_PUSH, 'location': location, 'value': int(word)}
         except ValueError as err:
-            print("%s:%d:%d:   %s " % (file_path, row, col, err))
+            print("%s:%d:%d:   %s " % location)
             exit(1)
     else:
         assert False, "Operand is unreachable"
@@ -125,26 +75,26 @@ def generate_blocks(program):
     block = []
     for ip in range(len(program)):
         assert cfg.OP_COUNT == 17, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
-        if program[ip][0] == cfg.OP_IF:
+        if program[ip]['action'] == cfg.OP_IF:
             block.append(ip)
-        if program[ip][0] == cfg.OP_ELSE:
+        if program[ip]['action'] == cfg.OP_ELSE:
             ref = block.pop()
-            assert program[ref][0] == cfg.OP_IF, "ERROR: 'else' can only be used in 'if' blocks"
-            program[ref] = (cfg.OP_IF, ip+1)
+            assert program[ref]['action'] == cfg.OP_IF, "ERROR: 'else' can only be used in 'if' blocks"
+            program[ref] = {'action': cfg.OP_IF, 'jump_to': ip+1}
             block.append(ip)
-        if program[ip][0] == cfg.OP_DO:
+        if program[ip]['action'] == cfg.OP_DO:
             block.append(ip)
-        if program[ip][0] == cfg.OP_WHILE:
+        if program[ip]['action'] == cfg.OP_WHILE:
             ref = block.pop()
-            assert program[ref][0] == cfg.OP_DO, "ERROR: 'do' can only be used in 'while' blocks"
-            program[ip] = (cfg.OP_WHILE, ref)
+            assert program[ref]['action'] == cfg.OP_DO, "ERROR: 'do' can only be used in 'while' blocks"
+            program[ip] = {'action': cfg.OP_WHILE, 'jump_to': ref}
             block.append(ip)
-        if program[ip][0] == cfg.OP_END:
+        if program[ip]['action'] == cfg.OP_END:
             ref = block.pop()
-            if program[ref][0] == cfg.OP_IF or program[ref][0] == cfg.OP_ELSE:
-                program[ip] = (cfg.OP_END, ip+1)
-                program[ref] = (program[ref][0], ip)
-            elif program[ref][0] == cfg.OP_WHILE:
-                program[ip] = (cfg.OP_END, program[ref][1])
-                program[ref] = (cfg.OP_WHILE, ip+1)
+            if program[ref]['action'] == cfg.OP_IF or program[ref]['action'] == cfg.OP_ELSE:
+                program[ip] = {'action': cfg.OP_END, 'jump_to': ip+1}
+                program[ref] = {'action': program[ref]['action'], 'jump_to': ip}
+            elif program[ref]['action'] == cfg.OP_WHILE:
+                program[ip] = {'action': cfg.OP_END, 'jump_to': program[ref]['jump_to']}
+                program[ref] = {'action': cfg.OP_WHILE, 'jump_to': ip+1}
     return program

@@ -1,5 +1,5 @@
-10 ## hello world!
-do dup 0 > while
-  dup 2 * print
-  1 -
+34 35 + 69 != if
+   420 print
+else
+   69 print
 end
