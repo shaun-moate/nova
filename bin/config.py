@@ -18,5 +18,10 @@ OP_END       = 0
 OP_WHILE     = 0
 OP_DO        = 0
 OP_DUPLICATE = 0
+OP_MEM       = 0
+OP_MEM_LOAD  = 0
+OP_MEM_STORE = 0
 OP_DUMP      = 0
 OP_COUNT     = 0
+
+MEM_ALLOCATION_SIZE = 69000
