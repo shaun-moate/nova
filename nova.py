@@ -28,6 +28,7 @@ cfg.OP_MEM_STORE = iota()
 cfg.OP_MEM_LOAD  = iota()
 cfg.OP_PRINT     = iota()
 cfg.OP_DUMP      = iota()
+cfg.OP_EXIT      = iota()
 cfg.OP_COUNT     = iota()
 
 def simulate_program(program):
@@ -36,7 +37,7 @@ def simulate_program(program):
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 21, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 22, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
@@ -131,6 +132,10 @@ def simulate_program(program):
             x = stack.pop()
             print(x)
             ip += 1
+        elif op['action'] == cfg.OP_EXIT:
+            x = stack.pop()
+            exit(x)
+            ip += 1
         else:
             assert False, "Operands is unreachable"
     print("-------------------------------------------")
@@ -175,7 +180,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 21, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 22, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op['action'] == cfg.OP_PUSH:
@@ -283,6 +288,10 @@ def compile_program(program):
             elif op['action'] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")
+            elif op['action'] == cfg.OP_EXIT:
+                out.write("    mov rax, 60\n")
+                out.write("    pop rdi\n")
+                out.write("    syscall\n")
             else:
                 assert False, "Operands is unreachable"
         out.write("addr_%d:\n" % len(program))

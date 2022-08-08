@@ -56,26 +56,12 @@ addr_4:
 addr_5:
     pop rax
     test rax, rax
-    jz addr_8
+    jz addr_19
 addr_6:
-    push 420
+    push 10
 addr_7:
-    pop rdi
-    call dump
+    push 10
 addr_8:
-    jmp addr_9
-addr_9:
-    push 34
-addr_10:
-    push 35
-addr_11:
-    pop rax
-    pop rbx
-    add rax, rbx
-    push rax
-addr_12:
-    push 69
-addr_13:
     mov rcx, 0
     mov rdx, 1
     pop rax
@@ -83,25 +69,40 @@ addr_13:
     cmp rax, rbx
     cmovne rcx, rdx
     push rcx
-addr_14:
+addr_9:
     pop rax
     test rax, rax
-    jz addr_18
+    jz addr_13
+addr_10:
+    push 13
+addr_11:
+    pop rdi
+    call dump
+addr_12:
+    jmp addr_17
+addr_13:
+    push 69
+addr_14:
+    mov rax, 60
+    pop rdi
+    syscall
 addr_15:
-    push 420
+    push 69
 addr_16:
     pop rdi
     call dump
 addr_17:
-    jmp addr_20
+    jmp addr_18
 addr_18:
-    push 69
+    jmp addr_21
 addr_19:
+    push 420
+addr_20:
     pop rdi
     call dump
-addr_20:
-    jmp addr_21
 addr_21:
+    jmp addr_22
+addr_22:
     mov rax, 60
     mov rdi, 0
     syscall
