@@ -100,7 +100,7 @@ def simulate_program(program):
                 ip += 1
         elif op['action'] == cfg.OP_ELSE:
             assert len(op) > 1, "ERROR: 'else' block has no referenced 'end'"
-            ip = op['jump_to']
+
         elif op['action'] == cfg.OP_DO:
             ip += 1
         elif op['action'] == cfg.OP_WHILE:
@@ -125,8 +125,8 @@ def simulate_program(program):
             stack.append(byte)
             ip += 1
         elif op['action'] == cfg.OP_PRINT:
-            ## TODO - implement to read allocated bytes dynamically
-            print(mem[:3])
+            print_len = stack.pop()
+            print(mem[:print_len].decode('utf-8'), end="")
             ip += 1
         elif op['action'] == cfg.OP_DUMP:
             x = stack.pop()
@@ -138,7 +138,7 @@ def simulate_program(program):
             ip += 1
         else:
             assert False, "Operands is unreachable"
-    print("-------------------------------------------")
+    print("\n-------------------------------------------")
 
 def compile_program(program):
     with open("build/output.asm", "w") as out:
