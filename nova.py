@@ -31,10 +31,11 @@ cfg.OP_COUNT     = iota()
 
 def simulate_program(program):
     stack = []
+    mem = bytearray(cfg.MEM_ALLOCATION_SIZE)
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 17, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 20, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
@@ -109,7 +110,17 @@ def simulate_program(program):
         elif op['action'] == cfg.OP_END:
             ip = op['jump_to']
         elif op['action'] == cfg.OP_MEM:
-            x = stack.append()
+            stack.append(0)
+            ip += 1
+        elif op['action'] == cfg.OP_MEM_STORE:
+            byte = stack.pop()
+            addr = stack.pop()
+            mem[addr] = byte
+            ip += 1
+        elif op['action'] == cfg.OP_MEM_LOAD:
+            addr = stack.pop()
+            byte = mem[addr]
+            stack.append(byte)
             ip += 1
         elif op['action'] == cfg.OP_DUMP:
             x = stack.pop()
