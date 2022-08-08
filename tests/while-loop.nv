@@ -1,5 +1,5 @@
 ## -- Basic 'while' loop
 69 do dup 0 > while
-   dup print
+   dup dump
    1 -
 end

@@ -1,10 +1,10 @@
 ## -- Nested 'if-else' statement --
 34 35 + 69 != if
    10 10 != if
-      13 print
+      13 dump
    else
-      69 print
+      69 dump
    end
 else
-   420 print
+   420 dump
 end

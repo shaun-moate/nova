@@ -18,9 +18,9 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
  - Implement an 'if' and 'else' statement
     ``` forth
     10 10 == if
-        69 print
+        69 dump
     else 
-        96 print
+        96 dump
     end
     ```
 
@@ -28,7 +28,7 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     ``` forth
     10 
     do dup 0 < while
-        dup print
+        dup dump
         1 -
     end
     ```
@@ -59,7 +59,6 @@ TODO -> adding mem keyword that will enable access to memory (** storing data to
     store_value = mem
     stack.append(store_value)
     ```
-
 ## Conditionals
  - if : will take the top item from the stack (expecting 1 or 0), where if value is 1 it will continue to execute, however if value is 0 is will skip to 'else' or 'end' 
     ```python

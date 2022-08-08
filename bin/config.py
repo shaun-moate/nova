@@ -21,6 +21,7 @@ OP_DUPLICATE = 0
 OP_MEM       = 0
 OP_MEM_LOAD  = 0
 OP_MEM_STORE = 0
+OP_PRINT     = 0
 OP_DUMP      = 0
 OP_COUNT     = 0
 

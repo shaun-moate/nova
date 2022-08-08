@@ -80,93 +80,109 @@ addr_14:
     pop rax
     mov [rax], bl
 addr_15:
-    push mem
+    push 3
 addr_16:
-    push 0
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, mem
+    pop rdx
+    syscall
 addr_17:
-    pop rax
-    pop rbx
-    add rax, rbx
-    push rax
+    push mem
 addr_18:
-    pop rax
-    push rax
-    push rax
+    push 0
 addr_19:
     pop rax
-    xor rbx, rbx
-    mov bl, [rax]
-    push rbx
+    pop rbx
+    add rax, rbx
+    push rax
 addr_20:
-    push 1
+    pop rax
+    push rax
+    push rax
 addr_21:
     pop rax
+    xor rbx, rbx
+    mov bl, [rax]
+    push rbx
+addr_22:
+    push 1
+addr_23:
+    pop rax
     pop rbx
     add rax, rbx
     push rax
-addr_22:
+addr_24:
     pop rbx
     pop rax
     mov [rax], bl
-addr_23:
-    push mem
-addr_24:
-    push 1
 addr_25:
-    pop rax
-    pop rbx
-    add rax, rbx
-    push rax
+    push mem
 addr_26:
-    pop rax
-    push rax
-    push rax
+    push 1
 addr_27:
     pop rax
-    xor rbx, rbx
-    mov bl, [rax]
-    push rbx
+    pop rbx
+    add rax, rbx
+    push rax
 addr_28:
-    push 1
+    pop rax
+    push rax
+    push rax
 addr_29:
     pop rax
+    xor rbx, rbx
+    mov bl, [rax]
+    push rbx
+addr_30:
+    push 1
+addr_31:
+    pop rax
     pop rbx
     add rax, rbx
     push rax
-addr_30:
+addr_32:
     pop rbx
     pop rax
     mov [rax], bl
-addr_31:
-    push mem
-addr_32:
-    push 2
 addr_33:
+    push mem
+addr_34:
+    push 2
+addr_35:
     pop rax
     pop rbx
     add rax, rbx
     push rax
-addr_34:
+addr_36:
     pop rax
     push rax
     push rax
-addr_35:
+addr_37:
     pop rax
     xor rbx, rbx
     mov bl, [rax]
     push rbx
-addr_36:
+addr_38:
     push 1
-addr_37:
+addr_39:
     pop rax
     pop rbx
     add rax, rbx
     push rax
-addr_38:
+addr_40:
     pop rbx
     pop rax
     mov [rax], bl
-addr_39:
+addr_41:
+    push 3
+addr_42:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, mem
+    pop rdx
+    syscall
+addr_43:
     mov rax, 60
     mov rdi, 0
     syscall

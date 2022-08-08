@@ -26,6 +26,7 @@ cfg.OP_DUPLICATE = iota()
 cfg.OP_MEM       = iota()
 cfg.OP_MEM_STORE = iota()
 cfg.OP_MEM_LOAD  = iota()
+cfg.OP_PRINT     = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_COUNT     = iota()
 
@@ -35,7 +36,7 @@ def simulate_program(program):
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 20, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 21, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
@@ -122,6 +123,10 @@ def simulate_program(program):
             byte = mem[addr]
             stack.append(byte)
             ip += 1
+        elif op['action'] == cfg.OP_PRINT:
+            ## TODO - implement to read allocated bytes dynamically
+            print(mem[:3])
+            ip += 1
         elif op['action'] == cfg.OP_DUMP:
             x = stack.pop()
             print(x)
@@ -170,7 +175,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 20, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 21, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op['action'] == cfg.OP_PUSH:
@@ -269,6 +274,12 @@ def compile_program(program):
                 out.write("    xor rbx, rbx\n")
                 out.write("    mov bl, [rax]\n")
                 out.write("    push rbx\n")
+            elif op['action'] == cfg.OP_PRINT:
+                out.write("    mov rax, 1\n")
+                out.write("    mov rdi, 1\n")
+                out.write("    mov rsi, mem\n")
+                out.write("    pop rdx\n")
+                out.write("    syscall\n")
             elif op['action'] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")

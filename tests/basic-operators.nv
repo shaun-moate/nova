@@ -1,17 +1,17 @@
 ## -- Greater than --
-69 420 > print
+69 420 > dump
 
 ## -- Greater than or equal to --
-69 420 >= print
+69 420 >= dump
 
 ## -- Less than --
-69 420 < print
+69 420 < dump
 
 ## -- Less than or equal to --
-69 420 <= print
+69 420 <= dump
 
 ## -- Equal --
-69 420 == print
+69 420 == dump
 
 ## -- Not Equal --
-69 420 != print
+69 420 != dump

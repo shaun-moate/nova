@@ -1,8 +1,8 @@
 ## -- Addition --
-34 35 + print
+34 35 + dump
 
 ## -- Subtraction --
-500 80 - print
+500 80 - dump
 
 ## -- Multiplication --
-7 6 * print
+7 6 * dump
