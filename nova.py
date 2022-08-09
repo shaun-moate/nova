@@ -27,7 +27,7 @@ cfg.OP_DUPLICATE = iota()
 cfg.OP_MEM_ADDR  = iota()
 cfg.OP_MEM_STORE = iota()
 cfg.OP_MEM_LOAD  = iota()
-cfg.OP_MEM_PRINT = iota()
+cfg.OP_SYSCALL   = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_EXIT      = iota()
 cfg.OP_COUNT     = iota()
@@ -132,9 +132,13 @@ def simulate_program(program):
             byte = mem[addr]
             stack.append(byte)
             ip += 1
-        elif op['action'] == cfg.OP_MEM_PRINT:
-            print_len = stack.pop()
-            print(mem[:print_len].decode('utf-8'), end="")
+        elif op['action'] == cfg.OP_SYSCALL:
+            syscall_num = stack.pop()
+            arg1 = stack.pop()
+            arg2 = stack.pop()
+            arg3 = stack.pop()
+            if syscall_num == 1:
+                print(mem[:arg3].decode('utf-8'), end="")
             ip += 1
         elif op['action'] == cfg.OP_EXIT:
             x = stack.pop()
@@ -288,10 +292,10 @@ def compile_program(program):
                 out.write("    xor rbx, rbx\n")
                 out.write("    mov bl, [rax]\n")
                 out.write("    push rbx\n")
-            elif op['action'] == cfg.OP_MEM_PRINT:
-                out.write("    mov rax, 1\n")
-                out.write("    mov rdi, 1\n")
-                out.write("    mov rsi, mem\n")
+            elif op['action'] == cfg.OP_SYSCALL:
+                out.write("    pop rax\n")
+                out.write("    pop rdi\n")
+                out.write("    pop rsi\n")
                 out.write("    pop rdx\n")
                 out.write("    syscall\n")
             elif op['action'] == cfg.OP_EXIT:

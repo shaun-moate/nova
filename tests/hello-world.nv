@@ -11,4 +11,4 @@ mem 9  + 114 store8
 mem 10 + 108 store8
 mem 11 + 100 store8
 mem 12 + 10  store8
-12 print
+12 mem 1 1 syscall

@@ -50,6 +50,13 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     print(a)
     ```
 
+ - dup : this key word will duplicate the value at the top of the stack
+    ```python
+    a = stack.pop()
+    stack.append(a)
+    stack.append(a)
+    ```
+
 ## Memory
 TODO -> adding mem keyword that will enable access to memory (** storing data to memory)
  - mem : pushes the address of the beginning of the memory allocation where you can write to and read from onto the stack 
@@ -70,6 +77,18 @@ TODO -> adding mem keyword that will enable access to memory (** storing data to
     store_value = mem
     stack.append(store_value)
     ```
+
+ - syscall : provides access to 3 args syscall (useful for writing to stdout)
+    ```python
+    syscall_num = stack.pop()
+    arg1 = stack.pop()
+    arg2 = stack.pop()
+    arg3 = stack.pop()
+    
+    if syscall_num = 1:
+        print(mem[:arg3])
+    ```
+
 ## Conditionals
  - if : will take the top item from the stack (expecting 1 or 0), where if value is 1 it will continue to execute, however if value is 0 is will skip to 'else' or 'end' 
     ```python
@@ -249,13 +268,5 @@ TODO -> adding mem keyword that will enable access to memory (** storing data to
     a = stack.pop()
     b = stack.pop()
     stack.append(int(b <= a))
-    ```
-
-## Stack Helpers
- - dup : this key word will duplicate the value at the top of the stack
-    ```python
-    a = stack.pop()
-    stack.append(a)
-    stack.append(a)
     ```
     
