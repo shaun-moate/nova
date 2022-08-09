@@ -8,6 +8,7 @@ from bin.help import usage
 from bin.lexer import parse_program_from_file
 
 cfg.OP_PUSH      = iota(True)
+cfg.OP_DROP      = iota()
 cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
 cfg.OP_MULT      = iota()
@@ -37,10 +38,17 @@ def simulate_program(program):
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 22, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 23, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
+            ip += 1
+        elif op['action'] == cfg.OP_DROP:
+            stack.pop()
+            ip += 1
+        elif op['action'] == cfg.OP_DUMP:
+            x = stack.pop()
+            print(x)
             ip += 1
         elif op['action'] == cfg.OP_DUPLICATE:
             x = stack.pop()
@@ -128,10 +136,6 @@ def simulate_program(program):
             print_len = stack.pop()
             print(mem[:print_len].decode('utf-8'), end="")
             ip += 1
-        elif op['action'] == cfg.OP_DUMP:
-            x = stack.pop()
-            print(x)
-            ip += 1
         elif op['action'] == cfg.OP_EXIT:
             x = stack.pop()
             exit(x)
@@ -180,11 +184,16 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 22, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 23, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op['action'] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op['value'])
+            elif op['action'] == cfg.OP_DROP:
+                out.write("    pop rax\n")
+            elif op['action'] == cfg.OP_DUMP:
+                out.write("    pop rdi\n")
+                out.write("    call dump\n")
             elif op['action'] == cfg.OP_PLUS:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
@@ -285,9 +294,6 @@ def compile_program(program):
                 out.write("    mov rsi, mem\n")
                 out.write("    pop rdx\n")
                 out.write("    syscall\n")
-            elif op['action'] == cfg.OP_DUMP:
-                out.write("    pop rdi\n")
-                out.write("    call dump\n")
             elif op['action'] == cfg.OP_EXIT:
                 out.write("    mov rax, 60\n")
                 out.write("    pop rdi\n")

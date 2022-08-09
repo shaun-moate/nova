@@ -33,10 +33,101 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     end
     ```
 
-## Types Allowed
+## Stack Operations
  - int : any integer that is found program is pushed to the stack
     ```python
     stack.append(a)
+    ```
+
+ - drop : pop the top item from the stack
+    ```python
+    stack.pop()
+    ```
+
+ - dump : pop the top item from the stack and print to stdout
+    ```python
+    a = stack.pop()
+    print(a)
+    ```
+
+## Memory
+TODO -> adding mem keyword that will enable access to memory (** storing data to memory)
+ - mem : pushes the address of the beginning of the memory allocation where you can write to and read from onto the stack 
+    ```python
+    stack.append(mem)
+    ```
+
+ - store8 : stores 8bits of memory at the allocated memory address
+    ```python
+    a = stack.pop(store_value)
+    b = stack.pop(mem)
+    mem = store_value
+    ```
+
+ - load8 : loads 8bits of memory at the allocated memory address to the stack
+    ```python
+    a = stack.pop(mem)
+    store_value = mem
+    stack.append(store_value)
+    ```
+## Conditionals
+ - if : will take the top item from the stack (expecting 1 or 0), where if value is 1 it will continue to execute, however if value is 0 is will skip to 'else' or 'end' 
+    ```python
+    a = stack.pop()
+    if a == 0:
+        // move into the 'else' block (passing by the 'else' statement) or skips to 'end'
+    else:
+        // continue into the block of code
+    ```
+
+ - else : else acts as a marker to simply skip to the 'end', noting an 'if' moving towards the 'else' is skipping to the 1st instruction in the 'else' block
+    ```python
+       // skip to the 'end' of the if statement
+    ```
+
+ - do : acts as a marker for the 'end' of a 'while' loop, indicating where the 'end' should iterate back to if the 'while' condition remains true
+    ```python
+       // a marker only for the 'while' loop
+    ```
+
+## Memory
+TODO -> adding mem keyword that will enable access to memory (** storing data to memory)
+ - mem : pushes the address of the beginning of the memory allocation where you can write to and read from onto the stack 
+    ```python
+    stack.append(mem)
+    ```
+
+ - store8 : stores 8bits of memory at the allocated memory address
+    ```python
+    a = stack.pop(store_value)
+    b = stack.pop(mem)
+    mem = store_value
+    ```
+
+ - load8 : loads 8bits of memory at the allocated memory address to the stack
+    ```python
+    a = stack.pop(mem)
+    store_value = mem
+    stack.append(store_value)
+    ```
+## Conditionals
+ - if : will take the top item from the stack (expecting 1 or 0), where if value is 1 it will continue to execute, however if value is 0 is will skip to 'else' or 'end' 
+    ```python
+    a = stack.pop()
+    if a == 0:
+        // move into the 'else' block (passing by the 'else' statement) or skips to 'end'
+    else:
+        // continue into the block of code
+    ```
+
+ - else : else acts as a marker to simply skip to the 'end', noting an 'if' moving towards the 'else' is skipping to the 1st instruction in the 'else' block
+    ```python
+       // skip to the 'end' of the if statement
+    ```
+
+ - do : acts as a marker for the 'end' of a 'while' loop, indicating where the 'end' should iterate back to if the 'while' condition remains true
+    ```python
+       // a marker only for the 'while' loop
     ```
 
 ## Memory
