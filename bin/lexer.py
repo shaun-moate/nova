@@ -37,13 +37,13 @@ def parse_token_as_op(token):
     elif word == "dup":
         return {'action': cfg.OP_DUPLICATE, 'location': location}
     elif word == "mem":
-        return {'action': cfg.OP_MEM, 'location': location}
+        return {'action': cfg.OP_MEM_ADDR, 'location': location}
     elif word == "store8":
         return {'action': cfg.OP_MEM_STORE, 'location': location}
     elif word == "load8":
         return {'action': cfg.OP_MEM_LOAD, 'location': location}
     elif word == "print":
-        return {'action': cfg.OP_PRINT, 'location': location}
+        return {'action': cfg.OP_MEM_PRINT, 'location': location}
     elif word == "dump":
         return {'action': cfg.OP_DUMP, 'location': location}
     elif word == "exit":

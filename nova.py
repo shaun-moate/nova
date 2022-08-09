@@ -23,10 +23,10 @@ cfg.OP_END       = iota()
 cfg.OP_WHILE     = iota()
 cfg.OP_DO        = iota()
 cfg.OP_DUPLICATE = iota()
-cfg.OP_MEM       = iota()
+cfg.OP_MEM_ADDR  = iota()
 cfg.OP_MEM_STORE = iota()
 cfg.OP_MEM_LOAD  = iota()
-cfg.OP_PRINT     = iota()
+cfg.OP_MEM_PRINT = iota()
 cfg.OP_DUMP      = iota()
 cfg.OP_EXIT      = iota()
 cfg.OP_COUNT     = iota()
@@ -111,7 +111,7 @@ def simulate_program(program):
                 ip += 1
         elif op['action'] == cfg.OP_END:
             ip = op['jump_to']
-        elif op['action'] == cfg.OP_MEM:
+        elif op['action'] == cfg.OP_MEM_ADDR:
             stack.append(0)
             ip += 1
         elif op['action'] == cfg.OP_MEM_STORE:
@@ -124,7 +124,7 @@ def simulate_program(program):
             byte = mem[addr]
             stack.append(byte)
             ip += 1
-        elif op['action'] == cfg.OP_PRINT:
+        elif op['action'] == cfg.OP_MEM_PRINT:
             print_len = stack.pop()
             print(mem[:print_len].decode('utf-8'), end="")
             ip += 1
@@ -268,7 +268,7 @@ def compile_program(program):
                 out.write("    jz addr_%d\n" % op['jump_to'])
             elif op['action'] == cfg.OP_END:
                 out.write("    jmp addr_%d\n" % op['jump_to'])
-            elif op['action'] == cfg.OP_MEM:
+            elif op['action'] == cfg.OP_MEM_ADDR:
                 out.write("    push mem\n")
             elif op['action'] == cfg.OP_MEM_STORE:
                 out.write("    pop rbx\n")
@@ -279,7 +279,7 @@ def compile_program(program):
                 out.write("    xor rbx, rbx\n")
                 out.write("    mov bl, [rax]\n")
                 out.write("    push rbx\n")
-            elif op['action'] == cfg.OP_PRINT:
+            elif op['action'] == cfg.OP_MEM_PRINT:
                 out.write("    mov rax, 1\n")
                 out.write("    mov rdi, 1\n")
                 out.write("    mov rsi, mem\n")
