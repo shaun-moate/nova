@@ -7,6 +7,7 @@ OP_OVER      = 0
 OP_SWAP      = 0
 OP_DROP      = 0
 OP_DUMP      = 0
+OP_SHL       = 0
 OP_PLUS      = 0
 OP_MINUS     = 0
 OP_MULT      = 0

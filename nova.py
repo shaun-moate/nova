@@ -12,6 +12,7 @@ cfg.OP_OVER      = iota()
 cfg.OP_SWAP      = iota()
 cfg.OP_DROP      = iota()
 cfg.OP_DUMP      = iota()
+cfg.OP_SHL       = iota()
 cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
 cfg.OP_MULT      = iota()
@@ -40,7 +41,7 @@ def simulate_program(program):
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 25, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 26, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
@@ -69,6 +70,11 @@ def simulate_program(program):
             x = stack.pop()
             stack.append(x)
             stack.append(x)
+            ip += 1
+        elif op['action'] == cfg.OP_SHL:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(y << x)
             ip += 1
         elif op['action'] == cfg.OP_PLUS:
             x = stack.pop()

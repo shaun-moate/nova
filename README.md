@@ -75,7 +75,6 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     ```
 
 ## Memory
-TODO -> adding mem keyword that will enable access to memory (** storing data to memory)
  - mem : pushes the address of the beginning of the memory allocation where you can write to and read from onto the stack 
     ```python
     stack.append(mem)
@@ -287,3 +286,10 @@ TODO -> adding mem keyword that will enable access to memory (** storing data to
     stack.append(int(b <= a))
     ```
     
+## Bitwise Operations
+ - shl: shift bits left by a designated amount
+ ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b << a)
+ ```
