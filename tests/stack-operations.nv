@@ -1,5 +1,8 @@
-## push 69 and dump from stack
+// push 69 and dump from stack
 69 dump
 
-## push 2 values, drop value from stack and dump
+// push 2 values, drop value from stack and dump
 420 69 drop dump
+
+// copy the 2nd from top op to the top of the stack
+69 420 over dump dump dump

@@ -8,7 +8,9 @@ from bin.help import usage
 from bin.lexer import parse_program_from_file
 
 cfg.OP_PUSH      = iota(True)
+cfg.OP_OVER      = iota()
 cfg.OP_DROP      = iota()
+cfg.OP_DUMP      = iota()
 cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
 cfg.OP_MULT      = iota()
@@ -28,7 +30,6 @@ cfg.OP_MEM_ADDR  = iota()
 cfg.OP_MEM_STORE = iota()
 cfg.OP_MEM_LOAD  = iota()
 cfg.OP_SYSCALL   = iota()
-cfg.OP_DUMP      = iota()
 cfg.OP_EXIT      = iota()
 cfg.OP_COUNT     = iota()
 
@@ -38,10 +39,17 @@ def simulate_program(program):
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 23, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 24, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
+            ip += 1
+        elif op['action'] == cfg.OP_OVER:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(y)
+            stack.append(x)
+            stack.append(y)
             ip += 1
         elif op['action'] == cfg.OP_DROP:
             stack.pop()
@@ -188,11 +196,17 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 23, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 24, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op['action'] == cfg.OP_PUSH:
                 out.write("    push %d\n" % op['value'])
+            elif op['action'] == cfg.OP_OVER:
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    push rbx\n")
+                out.write("    push rax\n")
+                out.write("    push rbx\n")
             elif op['action'] == cfg.OP_DROP:
                 out.write("    pop rax\n")
             elif op['action'] == cfg.OP_DUMP:

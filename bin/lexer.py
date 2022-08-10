@@ -5,7 +5,7 @@ import bin.config as cfg
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
     location = (file_path, row+1, col+1, word)
-    assert cfg.OP_COUNT == 23, "Exhaustive list of operands in parse_token_as_op()"
+    assert cfg.OP_COUNT == 24, "Exhaustive list of operands in parse_token_as_op()"
     if word == "+":
         return {'action': cfg.OP_PLUS, 'location': location}
     elif word == "-":
@@ -44,12 +44,14 @@ def parse_token_as_op(token):
         return {'action': cfg.OP_MEM_LOAD, 'location': location}
     elif word == "syscall":
         return {'action': cfg.OP_SYSCALL, 'location': location}
+    elif word == "over":
+        return {'action': cfg.OP_OVER, 'location': location}
     elif word == "dump":
         return {'action': cfg.OP_DUMP, 'location': location}
-    elif word == "exit":
-        return {'action': cfg.OP_EXIT, 'location': location}
     elif word == "drop":
         return {'action': cfg.OP_DROP, 'location': location}
+    elif word == "exit":
+        return {'action': cfg.OP_EXIT, 'location': location}
     elif "." not in word:
         try:
             return {'action': cfg.OP_PUSH, 'location': location, 'value': int(word)}
@@ -69,7 +71,7 @@ def parse_tokens_from_file(input_file_path):
     with open(input_file_path, "r") as file:
         return [(input_file_path, row+1, col+1, token)
                 for (row, line) in enumerate(file.readlines())
-                for (col, token) in parse_line(line.split("##")[0])]
+                for (col, token) in parse_line(line.split("//")[0])]
 
 def parse_line(line):
     start = find_next(line, 0, lambda x: not x.isspace())
@@ -86,7 +88,7 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert cfg.OP_COUNT == 23, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert cfg.OP_COUNT == 24, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip]['action'] == cfg.OP_IF:
             block.append(ip)
         if program[ip]['action'] == cfg.OP_ELSE:

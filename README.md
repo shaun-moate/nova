@@ -39,6 +39,15 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     stack.append(a)
     ```
 
+ - over : copy the '2nd from top' item in the stack -> to the top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b)
+    stack.append(a)
+    stack.append(b)
+    ```
+    
  - drop : pop the top item from the stack
     ```python
     stack.pop()

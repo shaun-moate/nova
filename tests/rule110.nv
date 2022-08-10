@@ -1,4 +1,4 @@
-## implement rule 110
+// implement rule 110
 mem 1 + 1 store8
 mem 28 + 1 store8
 
