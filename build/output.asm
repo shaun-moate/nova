@@ -83,6 +83,29 @@ addr_16:
     pop rdi
     call dump
 addr_17:
+    push 69
+addr_18:
+    push 420
+addr_19:
+    pop rax
+    pop rbx
+    push rbx
+    push rax
+    push rbx
+    push rax
+addr_20:
+    pop rdi
+    call dump
+addr_21:
+    pop rdi
+    call dump
+addr_22:
+    pop rdi
+    call dump
+addr_23:
+    pop rdi
+    call dump
+addr_24:
     mov rax, 60
     mov rdi, 0
     syscall

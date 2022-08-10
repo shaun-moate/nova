@@ -74,6 +74,16 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     stack.append(a)
     ```
 
+ - 2dup : this key word will duplicate the top 2 values at the top of the stack
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b)
+    stack.append(a)
+    stack.append(b)
+    stack.append(a)
+    ```
+
 ## Memory
  - mem : pushes the address of the beginning of the memory allocation where you can write to and read from onto the stack 
     ```python
