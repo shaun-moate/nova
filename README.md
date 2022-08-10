@@ -287,16 +287,24 @@ TODO -> adding mem keyword that will enable access to memory (** storing data to
     ```
     
 ## Bitwise Operations
- - shl: shift bits left by a designated amount
+ - shl : shift bits left by a designated amount
  ```python
     a = stack.pop()
     b = stack.pop()
     stack.append(b << a)
  ```
 
- - shr: shift bits right by a designated amount
+ - shr : shift bits right by a designated amount
  ```python
     a = stack.pop()
     b = stack.pop()
     stack.append(b >> a)
  ```
+
+ - & : bitwise AND operation
+ ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b & a)
+ ```
+

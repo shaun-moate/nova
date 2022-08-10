@@ -5,7 +5,7 @@ import bin.config as cfg
 def parse_token_as_op(token):
     (file_path, row, col, word) = token
     location = (file_path, row+1, col+1, word)
-    assert cfg.OP_COUNT == 27, "Exhaustive list of operands in parse_token_as_op()"
+    assert cfg.OP_COUNT == 28, "Exhaustive list of operands in parse_token_as_op()"
     if word == "+":
         return {'action': cfg.OP_PLUS, 'location': location}
     elif word == "-":
@@ -56,6 +56,8 @@ def parse_token_as_op(token):
         return {'action': cfg.OP_SHL, 'location': location}
     elif word == "shr":
         return {'action': cfg.OP_SHR, 'location': location}
+    elif word == "&":
+        return {'action': cfg.OP_B_AND, 'location': location}
     elif word == "exit":
         return {'action': cfg.OP_EXIT, 'location': location}
     elif "." not in word:
@@ -94,7 +96,7 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert cfg.OP_COUNT == 27, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert cfg.OP_COUNT == 28, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip]['action'] == cfg.OP_IF:
             block.append(ip)
         if program[ip]['action'] == cfg.OP_ELSE:

@@ -5,3 +5,7 @@
 1 1 shr dump
 8 2 shr dump
 2 1 shr dump
+
+2 3 & dump
+3 5 & dump
+15 3 & dump

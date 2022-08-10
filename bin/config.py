@@ -9,6 +9,7 @@ OP_DROP      = 0
 OP_DUMP      = 0
 OP_SHL       = 0
 OP_SHR       = 0
+OP_B_AND     = 0
 OP_PLUS      = 0
 OP_MINUS     = 0
 OP_MULT      = 0
