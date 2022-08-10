@@ -92,21 +92,27 @@ def generate_blocks(program):
         if program[ip]['action'] == cfg.OP_ELSE:
             ref = block.pop()
             assert program[ref]['action'] == cfg.OP_IF, "ERROR: 'else' can only be used in 'if' blocks"
-            program[ref] = {'action': cfg.OP_IF, 'jump_to': ip+1}
+            program[ref]['action'] = cfg.OP_IF
+            program[ref]['jump_to'] = ip+1
             block.append(ip)
         if program[ip]['action'] == cfg.OP_DO:
             block.append(ip)
         if program[ip]['action'] == cfg.OP_WHILE:
             ref = block.pop()
             assert program[ref]['action'] == cfg.OP_DO, "ERROR: 'do' can only be used in 'while' blocks"
-            program[ip] = {'action': cfg.OP_WHILE, 'jump_to': ref}
+            program[ip]['action'] = cfg.OP_WHILE
+            program[ip]['jump_to'] = ref
             block.append(ip)
         if program[ip]['action'] == cfg.OP_END:
             ref = block.pop()
             if program[ref]['action'] == cfg.OP_IF or program[ref]['action'] == cfg.OP_ELSE:
-                program[ip] = {'action': cfg.OP_END, 'jump_to': ip+1}
-                program[ref] = {'action': program[ref]['action'], 'jump_to': ip}
+                program[ip]['action'] = cfg.OP_END
+                program[ip]['jump_to'] = ip+1
+                program[ref]['action'] = program[ref]['action']
+                program[ref]['jump_to'] = ip
             elif program[ref]['action'] == cfg.OP_WHILE:
-                program[ip] = {'action': cfg.OP_END, 'jump_to': program[ref]['jump_to']}
-                program[ref] = {'action': cfg.OP_WHILE, 'jump_to': ip+1}
+                program[ip]['action'] = cfg.OP_END
+                program[ip]['jump_to'] = program[ref]['jump_to']
+                program[ref]['action'] = cfg.OP_WHILE
+                program[ref]['jump_to'] = ip+1
     return program

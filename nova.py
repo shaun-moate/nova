@@ -108,7 +108,7 @@ def simulate_program(program):
                 ip += 1
         elif op['action'] == cfg.OP_ELSE:
             assert len(op) > 1, "ERROR: 'else' block has no referenced 'end'"
-
+            ip = op['jump_to']
         elif op['action'] == cfg.OP_DO:
             ip += 1
         elif op['action'] == cfg.OP_WHILE:
@@ -125,7 +125,7 @@ def simulate_program(program):
         elif op['action'] == cfg.OP_MEM_STORE:
             byte = stack.pop()
             addr = stack.pop()
-            mem[addr] = byte
+            mem[addr] = byte & 0xFF
             ip += 1
         elif op['action'] == cfg.OP_MEM_LOAD:
             addr = stack.pop()
@@ -138,7 +138,7 @@ def simulate_program(program):
             arg2 = stack.pop()
             arg3 = stack.pop()
             if syscall_num == 1:
-                print(mem[:arg3].decode('utf-8'), end="")
+                print(mem[arg2:arg2+arg3].decode('utf-8'), end="")
             ip += 1
         elif op['action'] == cfg.OP_EXIT:
             x = stack.pop()
@@ -198,14 +198,14 @@ def compile_program(program):
             elif op['action'] == cfg.OP_DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")
+            elif op['action'] == cfg.OP_DUPLICATE:
+                out.write("    pop rax\n")
+                out.write("    push rax\n")
+                out.write("    push rax\n")
             elif op['action'] == cfg.OP_PLUS:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    add rax, rbx\n")
-                out.write("    push rax\n")
-            elif op['action'] == cfg.OP_DUPLICATE:
-                out.write("    pop rax\n")
-                out.write("    push rax\n")
                 out.write("    push rax\n")
             elif op['action'] == cfg.OP_MINUS:
                 out.write("    pop rax\n")
@@ -345,6 +345,7 @@ if __name__ == '__main__':
                 program = parse_program_from_file(input_file_path)
                 compile_program(program)
                 subprocess.call(["build/output"])
+                print("\n-------------------------------------------")
         elif len(argv) <= 1:
             (input_file_path, argv) = uncons(argv)
             program = parse_program_from_file(input_file_path)

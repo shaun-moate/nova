@@ -1,0 +1,9 @@
+0 do dup 5 < while
+  0 do dup 3 < while
+    dup dump
+    1 +
+  end
+  drop
+  1 +
+end
+drop

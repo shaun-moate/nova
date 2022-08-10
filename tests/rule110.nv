@@ -1,0 +1,24 @@
+## implement rule 110
+mem 1 + 1 store8
+mem 28 + 1 store8
+
+0 do dup 28 < while
+  0 do dup 30 < while
+    dup mem + load8
+    if
+      mem 30 + 42 store8
+    else
+      mem 30 + 32 store8
+    end
+
+    1 mem 30 + 1 1 syscall
+    1 +
+  end
+  drop
+
+  mem 30 + 10 store8
+
+  1 mem 30 + 1 1 syscall
+  1 +
+end
+drop
