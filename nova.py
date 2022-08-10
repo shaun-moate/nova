@@ -209,7 +209,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 25, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 26, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op['action'] == cfg.OP_PUSH:
@@ -233,6 +233,11 @@ def compile_program(program):
             elif op['action'] == cfg.OP_DUPLICATE:
                 out.write("    pop rax\n")
                 out.write("    push rax\n")
+                out.write("    push rax\n")
+            elif op['action'] == cfg.OP_SHL:
+                out.write("    pop rcx\n")
+                out.write("    pop rax\n")
+                out.write("    shl rax, cl\n")
                 out.write("    push rax\n")
             elif op['action'] == cfg.OP_PLUS:
                 out.write("    pop rax\n")
