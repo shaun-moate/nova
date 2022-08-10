@@ -6,3 +6,6 @@
 
 // copy the 2nd from top op to the top of the stack
 69 420 over dump dump dump
+
+// swap top 2 items in the stack
+1 2 swap dump dump

@@ -68,6 +68,21 @@ addr_11:
     pop rdi
     call dump
 addr_12:
+    push 1
+addr_13:
+    push 2
+addr_14:
+    pop rax
+    pop rbx
+    push rax
+    push rbx
+addr_15:
+    pop rdi
+    call dump
+addr_16:
+    pop rdi
+    call dump
+addr_17:
     mov rax, 60
     mov rdi, 0
     syscall

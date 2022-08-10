@@ -4,6 +4,7 @@ iota_counter = 0
 
 OP_PUSH      = 0
 OP_OVER      = 0
+OP_SWAP      = 0
 OP_DROP      = 0
 OP_DUMP      = 0
 OP_PLUS      = 0

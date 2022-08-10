@@ -48,6 +48,14 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     stack.append(b)
     ```
     
+ - swap : exchange the top 2 items in the stack around
+    ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(a)
+    stack.append(b)
+    ```
+    
  - drop : pop the top item from the stack
     ```python
     stack.pop()
