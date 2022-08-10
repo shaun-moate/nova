@@ -6,6 +6,10 @@
 8 2 shr dump
 2 1 shr dump
 
-2 3 & dump
-3 5 & dump
-15 3 & dump
+2 3 band dump
+3 5 band dump
+15 3 band dump
+
+2 3 bor dump
+1 2 bor dump
+4 1 bor dump

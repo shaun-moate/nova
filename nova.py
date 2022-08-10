@@ -15,6 +15,7 @@ cfg.OP_DUMP      = iota()
 cfg.OP_SHL       = iota()
 cfg.OP_SHR       = iota()
 cfg.OP_B_AND     = iota()
+cfg.OP_B_OR      = iota()
 cfg.OP_PLUS      = iota()
 cfg.OP_MINUS     = iota()
 cfg.OP_MULT      = iota()
@@ -43,7 +44,7 @@ def simulate_program(program):
     ip = 0
     print("RESULTS:-----------------------------------")
     while ip < len(program):
-        assert cfg.OP_COUNT == 28, "Exhaustive list of operands in simulate_program()"
+        assert cfg.OP_COUNT == 29, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op['action'] == cfg.OP_PUSH:
             stack.append(op['value'])
@@ -87,6 +88,11 @@ def simulate_program(program):
             x = stack.pop()
             y = stack.pop()
             stack.append(y & x)
+            ip += 1
+        elif op['action'] == cfg.OP_B_OR:
+            x = stack.pop()
+            y = stack.pop()
+            stack.append(y | x)
             ip += 1
         elif op['action'] == cfg.OP_PLUS:
             x = stack.pop()
@@ -221,7 +227,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert cfg.OP_COUNT == 28, "Exhaustive list of operands in compile_program()"
+            assert cfg.OP_COUNT == 29, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op['action'] == cfg.OP_PUSH:
@@ -260,6 +266,11 @@ def compile_program(program):
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    and rax, rbx\n")
+                out.write("    push rax\n")
+            elif op['action'] == cfg.OP_B_OR:
+                out.write("    pop rax\n")
+                out.write("    pop rbx\n")
+                out.write("    or rax, rbx\n")
                 out.write("    push rax\n")
             elif op['action'] == cfg.OP_PLUS:
                 out.write("    pop rax\n")

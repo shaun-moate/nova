@@ -301,7 +301,14 @@ TODO -> adding mem keyword that will enable access to memory (** storing data to
     stack.append(b >> a)
  ```
 
- - & : bitwise AND operation
+ - band : bitwise AND operation
+ ```python
+    a = stack.pop()
+    b = stack.pop()
+    stack.append(b & a)
+ ```
+
+ - bor : bitwise OR operation
  ```python
     a = stack.pop()
     b = stack.pop()
