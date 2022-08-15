@@ -19,4 +19,4 @@ jobs:
           architecture: 'x64'
       # You can test your matrix by printing the current Python version
       - name: Run Nova-Lang Tests
-        run: python test-nova.py --run tests
+        run: ./test-nova.py --run tests
