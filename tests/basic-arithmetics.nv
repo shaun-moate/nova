@@ -1,8 +1,8 @@
-## -- Addition --
+// -- Addition --
 34 35 + dump
 
-## -- Subtraction --
+// -- Subtraction --
 500 80 - dump
 
-## -- Multiplication --
+// -- Multiplication --
 7 6 * dump

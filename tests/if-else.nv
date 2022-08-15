@@ -1,9 +1,9 @@
-## -- Basic 'if' statement --
+// -- Basic 'if' statement --
 34 35 + 69 == if
    420 dump
 end
 
-## -- Basic 'if-else' statement --
+// -- Basic 'if-else' statement --
 34 35 + 69 != if
    420 dump
 else
