@@ -38,6 +38,7 @@ def run_all_test_cases(input_directory: str):
    print("[INFO] all tests have concluded: SUCCESS = %d, FAILURES = %d" % (SUCCESS, FAIL))
    if len(FAILURE_LIST) > 0:
        print("[INFO] for reference, following test cases failed:\n%s" % (FAILURE_LIST))
+       exit(1)
 
 def run_test_case(input_file_path: str):
    global SUCCESS

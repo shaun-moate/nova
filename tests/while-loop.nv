@@ -1,4 +1,4 @@
-## -- Basic 'while' loop
+// -- Basic 'while' loop
 69 do dup 0 > while
    dup dump
    1 -

@@ -1,17 +1,17 @@
-## -- Greater than --
+// -- Greater than --
 69 420 > dump
 
-## -- Greater than or equal to --
+// -- Greater than or equal to --
 69 420 >= dump
 
-## -- Less than --
+// -- Less than --
 69 420 < dump
 
-## -- Less than or equal to --
+// -- Less than or equal to --
 69 420 <= dump
 
-## -- Equal --
+// -- Equal --
 69 420 == dump
 
-## -- Not Equal --
+// -- Not Equal --
 69 420 != dump
