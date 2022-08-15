@@ -15,7 +15,7 @@ jobs:
           # Semantic version range syntax or exact version of a Python version
           python-version: '3.10.5'
           # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x86'
+          architecture: 'x64'
       # You can test your matrix by printing the current Python version
       - name: Run Nova-Lang Tests
         run: ./test-nova.py --run tests
