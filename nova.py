@@ -39,6 +39,10 @@ cfg.OP_SYSCALL   = iota()
 cfg.OP_EXIT      = iota()
 cfg.OP_COUNT     = iota()
 
+cfg.TOKEN_OP     = iota(True)
+cfg.TOKEN_INT    = iota()
+cfg.TOKEN_COUNT  = iota()
+
 def simulate_program(program):
     stack = []
     mem = bytearray(cfg.MEM_ALLOCATION_SIZE)

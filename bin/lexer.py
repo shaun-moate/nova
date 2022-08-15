@@ -3,75 +3,75 @@
 import bin.config as cfg
 
 def parse_token_as_op(token):
-    (file_path, row, col, word) = token
-    location = (file_path, row+1, col+1, word)
+    assert cfg.TOKEN_COUNT == 2, "Exhaustive list of operands in parse_word()"
+    location = token['location']
+    word = token['value']
     assert cfg.OP_COUNT == 30, "Exhaustive list of operands in parse_token_as_op()"
-    if word == "+":
-        return {'action': cfg.OP_PLUS, 'location': location}
-    elif word == "-":
-        return {'action': cfg.OP_MINUS, 'location': location}
-    elif word == "*":
-        return {'action': cfg.OP_MULT, 'location': location}
-    elif word == "==":
-        return {'action': cfg.OP_EQUAL, 'location': location}
-    elif word == "!=":
-        return {'action': cfg.OP_NOT_EQUAL, 'location': location}
-    elif word == ">":
-        return {'action': cfg.OP_GREATER, 'location': location}
-    elif word == ">=":
-        return {'action': cfg.OP_GR_EQ, 'location': location}
-    elif word == "<":
-        return {'action': cfg.OP_LESSER, 'location': location}
-    elif word == "<=":
-        return {'action': cfg.OP_LESS_EQ, 'location': location}
-    elif word == "if":
-        return {'action': cfg.OP_IF, 'location': location, 'jump_to': 0}
-    elif word == "else":
-        return {'action': cfg.OP_ELSE, 'location': location, 'jump_to': 0}
-    elif word == "end":
-        return {'action': cfg.OP_END, 'location': location, 'jump_to': 0}
-    elif word == "while":
-        return {'action': cfg.OP_WHILE, 'location': location, 'jump_to': 0}
-    elif word == "do":
-        return {'action': cfg.OP_DO, 'location': location, 'jump_to': 0}
-    elif word == "mem":
-        return {'action': cfg.OP_MEM_ADDR, 'location': location}
-    elif word == "store8":
-        return {'action': cfg.OP_MEM_STORE, 'location': location}
-    elif word == "load8":
-        return {'action': cfg.OP_MEM_LOAD, 'location': location}
-    elif word == "syscall":
-        return {'action': cfg.OP_SYSCALL, 'location': location}
-    elif word == "over":
-        return {'action': cfg.OP_OVER, 'location': location}
-    elif word == "swap":
-        return {'action': cfg.OP_SWAP, 'location': location}
-    elif word == "dup":
-        return {'action': cfg.OP_DUP, 'location': location}
-    elif word == "2dup":
-        return {'action': cfg.OP_2DUP, 'location': location}
-    elif word == "dump":
-        return {'action': cfg.OP_DUMP, 'location': location}
-    elif word == "drop":
-        return {'action': cfg.OP_DROP, 'location': location}
-    elif word == "shl":
-        return {'action': cfg.OP_SHL, 'location': location}
-    elif word == "shr":
-        return {'action': cfg.OP_SHR, 'location': location}
-    elif word == "band":
-        return {'action': cfg.OP_B_AND, 'location': location}
-    elif word == "bor":
-        return {'action': cfg.OP_B_OR, 'location': location}
-    elif word == "exit":
-        return {'action': cfg.OP_EXIT, 'location': location}
-    elif "." not in word:
-        try:
-            return {'action': cfg.OP_PUSH, 'location': location, 'value': int(word)}
-        except ValueError as err:
-            print("%s:%d:%d:   %s " % location)
-            exit(1)
+    if token['type'] == 0:
+        if word == "+":
+            return {'action': cfg.OP_PLUS, 'location': location}
+        elif word == "-":
+            return {'action': cfg.OP_MINUS, 'location': location}
+        elif word == "*":
+            return {'action': cfg.OP_MULT, 'location': location}
+        elif word == "==":
+            return {'action': cfg.OP_EQUAL, 'location': location}
+        elif word == "!=":
+            return {'action': cfg.OP_NOT_EQUAL, 'location': location}
+        elif word == ">":
+            return {'action': cfg.OP_GREATER, 'location': location}
+        elif word == ">=":
+            return {'action': cfg.OP_GR_EQ, 'location': location}
+        elif word == "<":
+            return {'action': cfg.OP_LESSER, 'location': location}
+        elif word == "<=":
+            return {'action': cfg.OP_LESS_EQ, 'location': location}
+        elif word == "if":
+            return {'action': cfg.OP_IF, 'location': location, 'jump_to': 0}
+        elif word == "else":
+            return {'action': cfg.OP_ELSE, 'location': location, 'jump_to': 0}
+        elif word == "end":
+            return {'action': cfg.OP_END, 'location': location, 'jump_to': 0}
+        elif word == "while":
+            return {'action': cfg.OP_WHILE, 'location': location, 'jump_to': 0}
+        elif word == "do":
+            return {'action': cfg.OP_DO, 'location': location, 'jump_to': 0}
+        elif word == "mem":
+            return {'action': cfg.OP_MEM_ADDR, 'location': location}
+        elif word == "store8":
+            return {'action': cfg.OP_MEM_STORE, 'location': location}
+        elif word == "load8":
+            return {'action': cfg.OP_MEM_LOAD, 'location': location}
+        elif word == "syscall":
+            return {'action': cfg.OP_SYSCALL, 'location': location}
+        elif word == "over":
+            return {'action': cfg.OP_OVER, 'location': location}
+        elif word == "swap":
+            return {'action': cfg.OP_SWAP, 'location': location}
+        elif word == "dup":
+            return {'action': cfg.OP_DUP, 'location': location}
+        elif word == "2dup":
+            return {'action': cfg.OP_2DUP, 'location': location}
+        elif word == "dump":
+            return {'action': cfg.OP_DUMP, 'location': location}
+        elif word == "drop":
+            return {'action': cfg.OP_DROP, 'location': location}
+        elif word == "shl":
+            return {'action': cfg.OP_SHL, 'location': location}
+        elif word == "shr":
+            return {'action': cfg.OP_SHR, 'location': location}
+        elif word == "band":
+            return {'action': cfg.OP_B_AND, 'location': location}
+        elif word == "bor":
+            return {'action': cfg.OP_B_OR, 'location': location}
+        elif word == "exit":
+            return {'action': cfg.OP_EXIT, 'location': location}
+        else:
+            assert False, "Operand is unreachable"
+    elif token['type'] == 1:
+        return {'action': cfg.OP_PUSH, 'location': location, 'value': word}
     else:
-        assert False, "Operand is unreachable"
+        assert False, "Token type is unreachable is unreachable"
 
 def parse_program_from_file(input_file_path):
     with open(input_file_path, "r") as file:
@@ -81,16 +81,25 @@ def parse_program_from_file(input_file_path):
 
 def parse_tokens_from_file(input_file_path):
     with open(input_file_path, "r") as file:
-        return [(input_file_path, row+1, col+1, token)
+        return [{'type': token_type,
+                 'location': (input_file_path, row+1, col+1),
+                 'value': token_value}
                 for (row, line) in enumerate(file.readlines())
-                for (col, token) in parse_line(line.split("//")[0])]
+                for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
 
 def parse_line(line):
     start = find_next(line, 0, lambda x: not x.isspace())
     while start < len(line):
         end = find_next(line, start, lambda x: x.isspace())
-        yield(start, line[start:end])
+        yield(start, parse_word(line[start:end]))
         start = find_next(line, end+1, lambda x: not x.isspace())
+
+def parse_word(token):
+    assert cfg.TOKEN_COUNT == 2, "Exhaustive list of operands in parse_word()"
+    try:
+        return (cfg.TOKEN_INT, int(token))
+    except ValueError:
+        return (cfg.TOKEN_OP, token)
 
 def find_next(line, start, predicate):
     while start < len(line) and not predicate(line[start]):
