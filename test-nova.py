@@ -4,13 +4,33 @@ import subprocess
 import sys
 import os
 
-from bin.common import uncons
-from bin.help import usage
-
 NOVA_EXT = ".nv"
 SUCCESS = 0
 FAIL = 0
 FAILURE_LIST = []
+
+def uncons(xs):
+    return (xs[0], xs[1:])
+
+def usage(program):
+    if program == "./nova.py":
+        print("-------------------------------------------")
+        print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
+        print("SUBCOMMANDS:")
+        print("    --compile  (-c) <file>       Compile the program to Assembly")
+        print("    --help                       Provide usage details")
+        print("    --simulate (-s) <file>       Simulate the program using Python3")
+        print("-------------------------------------------")
+        exit(1)
+    elif program == "./test-nova.py":
+        print("-------------------------------------------")
+        print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
+        print("SUBCOMMANDS:")
+        print("    --generate <dir>       Iterate through each test and store outputs")
+        print("    --help                 Provide usage details")
+        print("    --run      <dir>       Iterate through each test, providing back aggregate success/failures")
+        print("-------------------------------------------")
+        exit(1)
 
 def generate_all_test_cases(input_directory: str):
    assert os.path.isdir(input_directory), "ERROR: path must be a directory"

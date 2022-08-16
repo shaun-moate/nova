@@ -1,0 +1,4 @@
+5 do dup 0 > while
+  "Hello, World!\n" 1 1 syscall
+  1 -
+end

@@ -405,3 +405,4 @@ addr_107:
     syscall
 segment .bss
 mem: resb 69000
+segment .data
