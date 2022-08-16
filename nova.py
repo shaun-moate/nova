@@ -15,7 +15,8 @@ def iota(reset=False):
     iota_counter += 1
     return result
 
-OP_PUSH      = iota(True)
+OP_PUSH_INT  = iota(True)
+OP_PUSH_STR  = iota()
 OP_OVER      = iota()
 OP_SWAP      = iota()
 OP_DUP       = iota()
@@ -48,13 +49,13 @@ OP_EXIT      = iota()
 OP_COUNT     = iota()
 
 TOKEN_OP     = iota(True)
-TOKEN_STR    = iota()
 TOKEN_INT    = iota()
+TOKEN_STR    = iota()
 TOKEN_COUNT  = iota()
 
 MEM_ALLOCATION_SIZE = 69000
 
-assert OP_COUNT == 30, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+assert OP_COUNT == 31, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
 OP_WORDS = {
         "+": OP_PLUS,
         "-": OP_MINUS,
@@ -95,9 +96,12 @@ def parse_token_as_op(token):
         if token["value"] in OP_WORDS:
             return {"action": OP_WORDS[token["value"]], "location": token["location"], "value": token["value"]}
         else:
-            assert False, "Operand is unreachable"
+            print("%s:%d:%d: ERROR: unknown operand `%s` found" % (token["location"] + (token["value"], )))
+            exit(1)
     elif token["type"] == TOKEN_INT:
-        return {"action": OP_PUSH, "location": token["location"], "value": token["value"]}
+        return {"action": OP_PUSH_INT, "location": token["location"], "value": token["value"]}
+    elif token["type"] == TOKEN_STR:
+        return {"action": OP_PUSH_STR, "location": token["location"], "value": token["value"]}
     else:
         assert False, "Token type is unreachable is unreachable"
 
@@ -118,16 +122,23 @@ def parse_tokens_from_file(input_file_path):
 def parse_line(line):
     start = find_next(line, 0, lambda x: not x.isspace())
     while start < len(line):
-        end = find_next(line, start, lambda x: x.isspace())
-        yield(start, parse_word(line[start:end]))
+        if line[start] == "\"":
+            end = find_next(line, start+1, lambda x: x == "\"")
+            yield(start, parse_word(line[start+1:end], string=True))
+        else:
+            end = find_next(line, start, lambda x: x.isspace())
+            yield(start, parse_word(line[start:end]))
         start = find_next(line, end+1, lambda x: not x.isspace())
 
-def parse_word(token):
+def parse_word(token, string=False):
     assert TOKEN_COUNT == 3, "Exhaustive list of operands in parse_word()"
-    try:
-        return (TOKEN_INT, int(token))
-    except ValueError:
-        return (TOKEN_OP, token)
+    if string:
+        return (TOKEN_STR, token)
+    else:
+        try:
+            return (TOKEN_INT, int(token))
+        except ValueError:
+            return (TOKEN_OP, token)
 
 def find_next(line, start, predicate):
     while start < len(line) and not predicate(line[start]):
@@ -137,7 +148,7 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert OP_COUNT == 30, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert OP_COUNT == 31, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip]['action'] == OP_IF:
             block.append(ip)
         if program[ip]['action'] == OP_ELSE:
@@ -175,11 +186,13 @@ def simulate_program(program):
     print("RESULTS:-----------------------------------")
     print(OP_EQUAL)
     while ip < len(program):
-        assert OP_COUNT == 30, "Exhaustive list of operands in simulate_program()"
+        assert OP_COUNT == 31, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
-        if op['action'] == OP_PUSH:
+        if op['action'] == OP_PUSH_INT:
             stack.append(op['value'])
             ip += 1
+        elif op['action'] == OP_PUSH_STR:
+            assert False, "not implemented"
         elif op['action'] == OP_OVER:
             x = stack.pop()
             y = stack.pop()
@@ -369,7 +382,7 @@ def compile_program(program):
             assert OP_COUNT == 30, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
-            if op['action'] == OP_PUSH:
+            if op['action'] == OP_PUSH_INT:
                 out.write("    push %d\n" % op['value'])
             elif op['action'] == OP_OVER:
                 out.write("    pop rax\n")
