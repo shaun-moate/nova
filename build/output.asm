@@ -404,5 +404,5 @@ addr_107:
     mov rdi, 0
     syscall
 segment .bss
-mem: resb 69000
+    mem: resb 138000
 segment .data

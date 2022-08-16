@@ -555,12 +555,13 @@ def compile_program(program):
         out.write("    mov rdi, 0\n")
         out.write("    syscall\n")
         out.write("segment .bss\n")
-        out.write("mem: resb %d\n" % MEM_ALLOCATION_SIZE)
+        out.write("    mem: resb %d\n" % (STR_ALLOCATION_SIZE + MEM_ALLOCATION_SIZE))
         out.write("segment .data\n")
         for index, string in enumerate(str_stack):
             out.write("    str_%d: db " % index)
             for char in string:
                 out.write("%d, " % char)
+            out.write("\n")
         out.close()
         call_cmd()
 
