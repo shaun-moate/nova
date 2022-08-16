@@ -1,17 +1,2 @@
 // print 'Hello, World!'
-mem dup 72  store8
-1 + dup 101 store8
-1 + dup 108 store8
-1 + dup 108 store8
-1 + dup 111 store8
-1 + dup 44  store8
-1 + dup 32  store8
-1 + dup 87  store8
-1 + dup 111 store8
-1 + dup 114 store8
-1 + dup 108 store8
-1 + dup 100 store8
-1 + dup 33  store8
-1 + dup 10  store8
-1 +
-mem - mem 1 1 syscall
+"Hello, World!\n" 1 1 syscall
