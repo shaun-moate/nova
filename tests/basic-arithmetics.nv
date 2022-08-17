@@ -1,8 +1,0 @@
-// -- Addition --
-34 35 + dump
-
-// -- Subtraction --
-500 80 - dump
-
-// -- Multiplication --
-7 6 * dump

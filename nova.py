@@ -15,6 +15,7 @@ def iota(reset=False):
     iota_counter += 1
     return result
 
+## TODO: Add OP_ASSERT to support testing framework - enabling us to ensure we can assert() the expected correct result
 OP_PUSH_INT  = iota(True)
 OP_PUSH_STR  = iota()
 OP_OVER      = iota()

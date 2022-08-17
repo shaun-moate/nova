@@ -1,0 +1,5 @@
+// write 'abc' to buffer and print
+mem 0 + 97 store8
+mem 1 + 98 store8
+mem 2 + 99 store8
+3 mem 1 1 syscall
