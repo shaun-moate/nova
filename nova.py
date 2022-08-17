@@ -49,7 +49,11 @@ OP_SYSCALL   = iota()
 OP_EXIT      = iota()
 OP_COUNT     = iota()
 
+CONST_CATCH  = iota(True)
+CONST_COUNT  = iota()
+
 TOKEN_OP     = iota(True)
+TOKEN_CONST  = iota()
 TOKEN_INT    = iota()
 TOKEN_STR    = iota()
 TOKEN_COUNT  = iota()
@@ -58,48 +62,56 @@ STR_ALLOCATION_SIZE = 69_000
 MEM_ALLOCATION_SIZE = 69_000
 
 assert OP_COUNT == 31, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
-OP_WORDS = {
-        "+": OP_PLUS,
-        "-": OP_MINUS,
-        "*": OP_MULT,
-        "==": OP_EQUAL,
-        "!=": OP_NOT_EQUAL,
-        ">": OP_GREATER,
-        ">=": OP_GR_EQ,
-        "<": OP_LESSER,
-        "<=": OP_LESS_EQ,
-        "if": OP_IF,
-        "else": OP_ELSE,
-        "end": OP_END,
-        "while": OP_WHILE,
-        "do": OP_DO,
-        "mem": OP_MEM_ADDR,
-        "store8": OP_MEM_STORE,
-        "load8": OP_MEM_LOAD,
-        "syscall": OP_SYSCALL,
-        "over": OP_OVER,
-        "swap": OP_SWAP,
-        "dup": OP_DUP,
-        "2dup": OP_2DUP,
-        "dump": OP_DUMP,
-        "drop": OP_DROP,
-        "shl": OP_SHL,
-        "shr": OP_SHR,
-        "band": OP_B_AND,
-        "bor": OP_B_OR,
-        "exit": OP_EXIT
+BUILTIN_OPS = {
+    "+": OP_PLUS,
+    "-": OP_MINUS,
+    "*": OP_MULT,
+    "==": OP_EQUAL,
+    "!=": OP_NOT_EQUAL,
+    ">": OP_GREATER,
+    ">=": OP_GR_EQ,
+    "<": OP_LESSER,
+    "<=": OP_LESS_EQ,
+    "if": OP_IF,
+    "else": OP_ELSE,
+    "end": OP_END,
+    "while": OP_WHILE,
+    "do": OP_DO,
+    "mem": OP_MEM_ADDR,
+    "store8": OP_MEM_STORE,
+    "load8": OP_MEM_LOAD,
+    "syscall": OP_SYSCALL,
+    "over": OP_OVER,
+    "swap": OP_SWAP,
+    "dup": OP_DUP,
+    "2dup": OP_2DUP,
+    "dump": OP_DUMP,
+    "drop": OP_DROP,
+    "shl": OP_SHL,
+    "shr": OP_SHR,
+    "band": OP_B_AND,
+    "bor": OP_B_OR,
+    "exit": OP_EXIT
+}
+
+assert CONST_COUNT == 1, "Exhaustive list of constants"
+BUILTIN_CONST = {
+    "CATCH": 22,
 }
 
 def parse_token_as_op(token):
     location = token["location"]
     word = token["value"]
-    assert TOKEN_COUNT == 3, "Exhaustive list of operands in parse_word()"
+    assert TOKEN_COUNT == 4, "Exhaustive list of operands in parse_word()"
     if token["type"] == TOKEN_OP:
-        if token["value"] in OP_WORDS:
-            return {"action": OP_WORDS[token["value"]], "location": token["location"], "value": token["value"]}
+        if token["value"] in BUILTIN_OPS:
+            return {"action": BUILTIN_OPS[token["value"]], "location": token["location"], "value": token["value"]}
         else:
             print("%s:%d:%d: ERROR: unknown operand `%s` found" % (token["location"] + (token["value"], )))
             exit(1)
+    elif token["type"] == TOKEN_CONST:
+        if token["value"] in BUILTIN_CONST:
+            return {"action": OP_PUSH_INT, "location": token["location"], "value": int(BUILTIN_CONST[token["value"]])}
     elif token["type"] == TOKEN_INT:
         return {"action": OP_PUSH_INT, "location": token["location"], "value": token["value"]}
     elif token["type"] == TOKEN_STR:
@@ -126,16 +138,34 @@ def parse_line(line):
     while start < len(line):
         if line[start] == "\"":
             end = find_next(line, start+1, lambda x: x == "\"")
-            yield(start, parse_word(line[start+1:end], string=True))
+            yield(start, parse_word(line[start+1:end], typ="str"))
+        elif line[start:find_next(line, start, lambda x: x.isspace())] == "const":
+            end = find_next(line, start, lambda x: x.isspace())
+            start = find_next(line, end+1, lambda x: not x.isspace())
+            end = find_next(line, start, lambda x: x.isspace())
+            key = line[start:end]
+            if key in BUILTIN_CONST:
+                print("ERROR: attempting to override a built-in constant `%s` - not permitted" % key)
+                exit(1)
+            start = find_next(line, end+1, lambda x: not x.isspace())
+            end = find_next(line, start, lambda x: x.isspace())
+            value = line[start:end]
+            assert int(value), "ERROR: const value must be of type integer"
+            BUILTIN_CONST[key] = value
+        elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_CONST:
+            end = find_next(line, start, lambda x: x.isspace())
+            yield(start, parse_word(line[start:end], typ="const"))
         else:
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end]))
         start = find_next(line, end+1, lambda x: not x.isspace())
 
-def parse_word(token, string=False):
-    assert TOKEN_COUNT == 3, "Exhaustive list of operands in parse_word()"
-    if string:
+def parse_word(token, typ=None):
+    assert TOKEN_COUNT == 4, "Exhaustive list of operands in parse_word()"
+    if typ == "str":
         return (TOKEN_STR, bytes(token, "utf-8").decode("unicode_escape"))
+    elif typ == "const":
+        return (TOKEN_CONST, token)
     else:
         try:
             return (TOKEN_INT, int(token))
