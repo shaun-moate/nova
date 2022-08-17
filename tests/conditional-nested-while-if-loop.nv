@@ -1,0 +1,8 @@
+// nested if in while, print only 3 when counting to 5
+0 do dup 5 <= while
+   dup 3 == if
+      dup dump
+   end
+   1 +
+end
+drop

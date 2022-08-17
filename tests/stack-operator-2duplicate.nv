@@ -1,0 +1,2 @@
+// pop top 2 values from stack, push both values to top of stack twice
+69 420 2dup dump dump dump dump

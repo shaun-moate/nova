@@ -1,0 +1,2 @@
+// push 2 values, drop value from stack and dump
+420 69 drop dump

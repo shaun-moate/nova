@@ -1,0 +1,8 @@
+// nested while in if, count to 5 when if condition met
+34 35 + 69 if
+  0 do dup 5 <= while
+     dup dump
+     1 +
+  end
+  drop
+end
