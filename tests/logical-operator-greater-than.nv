@@ -1,0 +1,2 @@
+// print(69 > 69) results = 0 (False)
+69 69 > dump

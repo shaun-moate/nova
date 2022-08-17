@@ -1,4 +1,4 @@
-// -- Nested 'if-else' statement --
+// nested if-else statements offering multiple level of conditionals
 34 35 + 69 != if
    10 10 != if
       13 dump

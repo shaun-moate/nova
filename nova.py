@@ -15,6 +15,7 @@ def iota(reset=False):
     iota_counter += 1
     return result
 
+## TODO: Add OP_ASSERT to support testing framework - enabling us to ensure we can assert() the expected correct result
 OP_PUSH_INT  = iota(True)
 OP_PUSH_STR  = iota()
 OP_OVER      = iota()
@@ -185,7 +186,6 @@ def simulate_program(program):
     mem = bytearray(MEM_ALLOCATION_SIZE + STR_ALLOCATION_SIZE)
     str_addr_start = 0
     ip = 0
-    print("RESULTS:-----------------------------------")
     while ip < len(program):
         assert OP_COUNT == 31, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
@@ -348,7 +348,6 @@ def simulate_program(program):
             ip += 1
         else:
             assert False, "Operands is unreachable"
-    print("\n-------------------------------------------")
 
 def compile_program(program):
     str_stack = []
@@ -564,6 +563,16 @@ def compile_program(program):
             out.write("\n")
         out.close()
         call_cmd()
+
+def usage(program):
+    print("-------------------------------------------")
+    print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
+    print("SUBCOMMANDS:")
+    print("    --compile  (-c) <file>       Compile the program to Assembly")
+    print("    --help                       Provide usage details")
+    print("    --simulate (-s) <file>       Simulate the program using Python3")
+    print("-------------------------------------------")
+    exit(1)
 
 def call_cmd():
     print("BUILD:-------------------------------------")

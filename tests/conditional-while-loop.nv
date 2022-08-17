@@ -1,4 +1,4 @@
-// -- Basic 'while' loop
+// count down from 69 to 0
 69 do dup 0 > while
    dup dump
    1 -

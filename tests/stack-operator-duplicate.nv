@@ -1,0 +1,2 @@
+// pop top value from stack, push value to top of stack twice
+69 dup dump dump

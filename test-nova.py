@@ -5,32 +5,23 @@ import sys
 import os
 
 NOVA_EXT = ".nv"
-SUCCESS = 0
-FAIL = 0
-FAILURE_LIST = []
+COMPILE_FAIL = 0
+COMPILE_FAILURE_LIST = []
+SIMULATE_FAIL = 0
+SIMULATE_FAILURE_LIST = []
 
 def uncons(xs):
     return (xs[0], xs[1:])
 
 def usage(program):
-    if program == "./nova.py":
-        print("-------------------------------------------")
-        print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
-        print("SUBCOMMANDS:")
-        print("    --compile  (-c) <file>       Compile the program to Assembly")
-        print("    --help                       Provide usage details")
-        print("    --simulate (-s) <file>       Simulate the program using Python3")
-        print("-------------------------------------------")
-        exit(1)
-    elif program == "./test-nova.py":
-        print("-------------------------------------------")
-        print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
-        print("SUBCOMMANDS:")
-        print("    --generate <dir>       Iterate through each test and store outputs")
-        print("    --help                 Provide usage details")
-        print("    --run      <dir>       Iterate through each test, providing back aggregate success/failures")
-        print("-------------------------------------------")
-        exit(1)
+    print("-------------------------------------------")
+    print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
+    print("SUBCOMMANDS:")
+    print("    --generate <dir>       Iterate through each test and store outputs")
+    print("    --help                 Provide usage details")
+    print("    --run      <dir>       Iterate through each test, providing back aggregate success/failures")
+    print("-------------------------------------------")
+    exit(1)
 
 def generate_all_test_cases(input_directory: str):
    assert os.path.isdir(input_directory), "ERROR: path must be a directory"
@@ -55,27 +46,40 @@ def run_all_test_cases(input_directory: str):
        f = os.path.join(input_directory, file)
        if os.path.isfile(f) and f.endswith(".nv"):
            run_test_case(f)
-   print("[INFO] all tests have concluded: SUCCESS = %d, FAILURES = %d" % (SUCCESS, FAIL))
-   if len(FAILURE_LIST) > 0:
-       print("[INFO] for reference, following test cases failed:\n%s" % (FAILURE_LIST))
+   print("[INFO] failed test cases: simulated = %d, compiled = %d" % (SIMULATE_FAIL, COMPILE_FAIL))
+   if len(SIMULATE_FAILURE_LIST) > 0:
+       print("[INFO] for reference, following simulated test cases failed:\n%s" % (SIMULATE_FAILURE_LIST))
+       exit(1)
+   if len(COMPILE_FAILURE_LIST) > 0:
+       print("[INFO] for reference, following compiled test cases failed:\n%s" % (COMPILE_FAILURE_LIST))
        exit(1)
 
 def run_test_case(input_file_path: str):
-   global SUCCESS
-   global FAIL
-   global FAILURE_LIST
+   global COMPILE_FAIL
+   global COMPILE_FAILURE_LIST
+   global SIMULATE_FAIL
+   global SIMULATE_FAILURE_LIST
    print("[INFO] running test case: %s == %s" % (input_file_path, str(input_file_path[:-len(NOVA_EXT)])))
    if compile_test_case(input_file_path) == load_test_case(input_file_path):
-      print("[PASS] test case PASSED: %s" % (input_file_path))
-      SUCCESS += 1
+      print("[PASS] compilation of test case PASSED: %s" % (input_file_path))
    else:
-      print("[FAIL] test case FAILED: %s" % (input_file_path))
-      FAIL += 1
-      FAILURE_LIST.append(input_file_path)
+      print("[FAIL] compilation test case FAILED: %s" % (input_file_path))
+      COMPILE_FAIL += 1
+      COMPILE_FAILURE_LIST.append(input_file_path)
+   if simulate_test_case(input_file_path) == load_test_case(input_file_path):
+      print("[PASS] simulation of test case PASSED: %s" % (input_file_path))
+   else:
+      print("[FAIL] simulation test case FAILED: %s" % (input_file_path))
+      SIMULATE_FAIL += 1
+      SIMULATE_FAILURE_LIST.append(input_file_path)
 
 def compile_test_case(input_file_path: str):
     build = subprocess.run(["./nova.py", "-c", input_file_path], stdout=subprocess.DEVNULL)
     result = subprocess.run(["build/output"], capture_output=True, text=True)
+    return str(result.returncode) + result.stdout
+
+def simulate_test_case(input_file_path: str):
+    result = subprocess.run(["./nova.py", "-s" , input_file_path], capture_output=True, text=True)
     return str(result.returncode) + result.stdout
 
 def load_test_case(input_file_path: str):
