@@ -1,0 +1,3 @@
+// set local constant and utilise to print
+const HELLO 69
+HELLO dump
