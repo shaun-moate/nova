@@ -1,6 +1,6 @@
-// implement rule 98
-const BOARD_WIDTH 98
-const BOARD_DEPTH 100
+// implement rule 110
+const BOARD_WIDTH 100
+const ITERATIONS 49
 
 const INITIAL_CELL 49
 const ALIVE 42
@@ -12,21 +12,21 @@ const RULE 90
 
 mem INITIAL_CELL + 1 store8
 
-0 do dup BOARD_WIDTH < while
+0 do dup ITERATIONS < while
   // calculate the buffer (characters)
-  0 do dup BOARD_DEPTH < while
+  0 do dup BOARD_WIDTH < while
     dup mem + load8
     if
-      dup mem + BOARD_DEPTH + ALIVE store8
+      dup mem + BOARD_WIDTH + ALIVE store8
     else
-      dup mem + BOARD_DEPTH + DEAD store8
+      dup mem + BOARD_WIDTH + DEAD store8
     end
     1 +
   end
 
   // add `\n` to end of line and print out
-  mem + BOARD_DEPTH + NEW_LINE store8
-  BOARD_DEPTH 1 + mem BOARD_DEPTH + 1 1 syscall
+  mem + BOARD_WIDTH + NEW_LINE store8
+  BOARD_WIDTH 1 + mem BOARD_WIDTH + 1 1 syscall
 
   // pattern reference
   mem 0 + load8 1 shl
