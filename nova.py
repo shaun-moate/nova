@@ -40,9 +40,10 @@ OP_LESS_EQ   = iota()
 OP_IF        = iota()
 OP_ELSE      = iota()
 OP_FI        = iota()
-OP_END       = iota()
 OP_WHILE     = iota()
 OP_DO        = iota()
+OP_DONE      = iota()
+OP_END       = iota()
 OP_MEM_ADDR  = iota()
 OP_MEM_STORE = iota()
 OP_MEM_LOAD  = iota()
@@ -62,7 +63,7 @@ TOKEN_COUNT  = iota()
 STR_ALLOCATION_SIZE = 69_000
 MEM_ALLOCATION_SIZE = 69_000
 
-assert OP_COUNT == 32, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+assert OP_COUNT == 33, "Exhaustive list of operands"
 BUILTIN_OPS = {
     "+": OP_PLUS,
     "-": OP_MINUS,
@@ -76,9 +77,10 @@ BUILTIN_OPS = {
     "if": OP_IF,
     "else": OP_ELSE,
     "fi": OP_FI,
-    "end": OP_END,
     "while": OP_WHILE,
     "do": OP_DO,
+    "done": OP_DONE,
+    "end": OP_END,
     "mem": OP_MEM_ADDR,
     "store8": OP_MEM_STORE,
     "load8": OP_MEM_LOAD,
@@ -182,7 +184,7 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert OP_COUNT == 32, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert OP_COUNT == 33, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip]["action"] == OP_IF:
             block.append(ip)
         if program[ip]["action"] == OP_ELSE:
@@ -196,20 +198,20 @@ def generate_blocks(program):
             assert program[ref]["action"] == OP_IF or program[ref]["action"] == OP_ELSE, "ERROR: `fi` is expected to end the blocks for `if` or `else` only"
             program[ip]["jump_to"] = ip+1
             program[ref]["jump_to"] = ip
-        if program[ip]["action"] == OP_DO:
-            block.append(ip)
         if program[ip]["action"] == OP_WHILE:
+            block.append(ip)
+        if program[ip]["action"] == OP_DO:
             ref = block.pop()
-            assert program[ref]["action"] == OP_DO, "ERROR: `do` can only be used in `while` blocks"
-            program[ip]["action"] = OP_WHILE
+            assert program[ref]["action"] == OP_WHILE, "ERROR: `do` can only be used in `while` blocks"
             program[ip]["jump_to"] = ref
             block.append(ip)
-        if program[ip]["action"] == OP_END:
+        if program[ip]["action"] == OP_DONE:
             ref = block.pop()
-            if program[ref]["action"] == OP_WHILE:
-                program[ip]["jump_to"] = program[ref]["jump_to"]
-                program[ref]["action"] = OP_WHILE
-                program[ref]["jump_to"] = ip+1
+            program[ip]["jump_to"] = program[ref]["jump_to"]
+            program[ref]["action"] = OP_DO
+            program[ref]["jump_to"] = ip+1
+        if program[ip]["action"] == OP_END:
+            assert False, "not implemented"
     return program
 
 def simulate_program(program):
@@ -218,7 +220,7 @@ def simulate_program(program):
     str_addr_start = 0
     ip = 0
     while ip < len(program):
-        assert OP_COUNT == 32, "Exhaustive list of operands in simulate_program()"
+        assert OP_COUNT == 33, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op["action"] == OP_PUSH_INT:
             stack.append(op["value"])
@@ -344,16 +346,19 @@ def simulate_program(program):
             ip = op["jump_to"]
         elif op["action"] == OP_FI:
             ip = op["jump_to"]
-        elif op["action"] == OP_DO:
-            ip += 1
         elif op["action"] == OP_WHILE:
-            assert len(op) > 1, "ERROR: `do` block has no referenced `end`"
+            ip += 1
+        elif op["action"] == OP_DO:
+            assert len(op) > 1, "ERROR: `while` block has no referenced `done`"
             if stack.pop() == 0:
                 ip = op["jump_to"]
             else:
                 ip += 1
-        elif op["action"] == OP_END:
+        elif op["action"] == OP_DONE:
             ip = op["jump_to"]
+            ip += 1
+        elif op["action"] == OP_END:
+            assert False, "not implemented"
         elif op["action"] == OP_MEM_ADDR:
             stack.append(STR_ALLOCATION_SIZE)
             ip += 1
@@ -422,7 +427,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert OP_COUNT == 32, "Exhaustive list of operands in compile_program()"
+            assert OP_COUNT == 33, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op["action"] == OP_PUSH_INT:
@@ -552,15 +557,17 @@ def compile_program(program):
                 out.write("    jmp addr_%d\n" % op["jump_to"])
             elif op["action"] == OP_FI:
                 out.write("    jmp addr_%d\n" % op["jump_to"])
-            elif op["action"] == OP_DO:
-                pass
             elif op["action"] == OP_WHILE:
+                pass
+            elif op["action"] == OP_DO:
                 assert len(op) > 1, "ERROR: `do` block has no referenced `end`"
                 out.write("    pop rax\n")
                 out.write("    test rax, rax\n")
                 out.write("    jz addr_%d\n" % op["jump_to"])
-            elif op["action"] == OP_END:
+            elif op["action"] == OP_DONE:
                 out.write("    jmp addr_%d\n" % op["jump_to"])
+            elif op["action"] == OP_END:
+                assert False, "not implemented"
             elif op["action"] == OP_MEM_ADDR:
                 out.write("    push mem\n")
             elif op["action"] == OP_MEM_STORE:

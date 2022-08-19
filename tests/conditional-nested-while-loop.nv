@@ -1,10 +1,8 @@
 // nested while counting from 0 to 3, 5 times
-0 do dup 5 < while
-  0 do dup 3 < while
+0 while dup 5 < do
+  0 while dup 3 < do
     dup dump
     1 +
-  end
-  drop
+  done drop
   1 +
-end
-drop
+done drop
