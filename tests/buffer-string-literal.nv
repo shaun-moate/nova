@@ -1,2 +1,2 @@
-"Hello, World!\n" 1 1 syscall
-"Whatcha Doing!\n" 1 1 syscall
+"Hello, World!\n" write
+"Whatcha Doing!\n" write
