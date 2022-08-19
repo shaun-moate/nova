@@ -12,9 +12,9 @@ const RULE 90
 
 mem INITIAL_CELL + 1 store8
 
-0 do dup ITERATIONS < while
+0 while dup ITERATIONS < do
   // calculate the buffer (characters)
-  0 do dup BOARD_WIDTH < while
+  0 while dup BOARD_WIDTH < do
     dup mem + load8
     if
       dup mem + BOARD_WIDTH + ALIVE store8
@@ -22,7 +22,7 @@ mem INITIAL_CELL + 1 store8
       dup mem + BOARD_WIDTH + DEAD store8
     fi
     1 +
-  end
+  done
 
   // add `\n` to end of line and print out
   mem + BOARD_WIDTH + NEW_LINE store8
@@ -34,7 +34,7 @@ mem INITIAL_CELL + 1 store8
   bor
 
   // implement rule to generate new pattern
-  1 do dup BOARD_WIDTH < while
+  1 while dup BOARD_WIDTH < do
      swap 1 shl 7 band
      over 1 + mem + load8 bor
      2dup RULE swap shr 1 band
@@ -42,9 +42,9 @@ mem INITIAL_CELL + 1 store8
      swap
 
     1 +
-  end drop
+  done drop
   drop
 
   1 +
-end
+done
 drop

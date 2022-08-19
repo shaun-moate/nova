@@ -1,5 +1,7 @@
 // count down from 69 to 0
-69 do dup 0 > while
+69
+while dup 0 > do
    dup dump
    1 -
-end
+done
+drop
