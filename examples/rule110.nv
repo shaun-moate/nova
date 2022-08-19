@@ -20,7 +20,7 @@ mem INITIAL_CELL + 1 store8
       dup mem + BOARD_WIDTH + ALIVE store8
     else
       dup mem + BOARD_WIDTH + DEAD store8
-    end
+    fi
     1 +
   end
 

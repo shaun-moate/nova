@@ -2,7 +2,7 @@
 0 do dup 5 <= while
    dup 3 == if
       dup dump
-   end
+   fi
    1 +
 end
 drop
