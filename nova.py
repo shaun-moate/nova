@@ -39,6 +39,7 @@ OP_LESSER    = iota()
 OP_LESS_EQ   = iota()
 OP_IF        = iota()
 OP_ELSE      = iota()
+OP_FI        = iota()
 OP_END       = iota()
 OP_WHILE     = iota()
 OP_DO        = iota()
@@ -61,7 +62,7 @@ TOKEN_COUNT  = iota()
 STR_ALLOCATION_SIZE = 69_000
 MEM_ALLOCATION_SIZE = 69_000
 
-assert OP_COUNT == 31, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+assert OP_COUNT == 32, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
 BUILTIN_OPS = {
     "+": OP_PLUS,
     "-": OP_MINUS,
@@ -74,6 +75,7 @@ BUILTIN_OPS = {
     "<=": OP_LESS_EQ,
     "if": OP_IF,
     "else": OP_ELSE,
+    "fi": OP_FI,
     "end": OP_END,
     "while": OP_WHILE,
     "do": OP_DO,
@@ -180,7 +182,7 @@ def find_next(line, start, predicate):
 def generate_blocks(program):
     block = []
     for ip in range(len(program)):
-        assert OP_COUNT == 31, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
+        assert OP_COUNT == 32, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip]["action"] == OP_IF:
             block.append(ip)
         if program[ip]["action"] == OP_ELSE:
@@ -189,6 +191,11 @@ def generate_blocks(program):
             program[ref]["action"] = OP_IF
             program[ref]["jump_to"] = ip+1
             block.append(ip)
+        if program[ip]["action"] == OP_FI:
+            ref = block.pop()
+            assert program[ref]["action"] == OP_IF or program[ref]["action"] == OP_ELSE, "ERROR: `fi` is expected to end the blocks for `if` or `else` only"
+            program[ip]["jump_to"] = ip+1
+            program[ref]["jump_to"] = ip
         if program[ip]["action"] == OP_DO:
             block.append(ip)
         if program[ip]["action"] == OP_WHILE:
@@ -199,13 +206,7 @@ def generate_blocks(program):
             block.append(ip)
         if program[ip]["action"] == OP_END:
             ref = block.pop()
-            if program[ref]["action"] == OP_IF or program[ref]["action"] == OP_ELSE:
-                program[ip]["action"] = OP_END
-                program[ip]["jump_to"] = ip+1
-                program[ref]["action"] = program[ref]["action"]
-                program[ref]["jump_to"] = ip
-            elif program[ref]["action"] == OP_WHILE:
-                program[ip]["action"] = OP_END
+            if program[ref]["action"] == OP_WHILE:
                 program[ip]["jump_to"] = program[ref]["jump_to"]
                 program[ref]["action"] = OP_WHILE
                 program[ref]["jump_to"] = ip+1
@@ -217,7 +218,7 @@ def simulate_program(program):
     str_addr_start = 0
     ip = 0
     while ip < len(program):
-        assert OP_COUNT == 31, "Exhaustive list of operands in simulate_program()"
+        assert OP_COUNT == 32, "Exhaustive list of operands in simulate_program()"
         op = program[ip]
         if op["action"] == OP_PUSH_INT:
             stack.append(op["value"])
@@ -341,6 +342,8 @@ def simulate_program(program):
         elif op["action"] == OP_ELSE:
             assert len(op) > 1, "ERROR: `else` block has no referenced `end`"
             ip = op["jump_to"]
+        elif op["action"] == OP_FI:
+            ip = op["jump_to"]
         elif op["action"] == OP_DO:
             ip += 1
         elif op["action"] == OP_WHILE:
@@ -419,7 +422,7 @@ def compile_program(program):
 
         out.write("global _start\n_start:\n")
         for ip in range(len(program)):
-            assert OP_COUNT == 31, "Exhaustive list of operands in compile_program()"
+            assert OP_COUNT == 32, "Exhaustive list of operands in compile_program()"
             op = program[ip]
             out.write("addr_%d:\n" % ip)
             if op["action"] == OP_PUSH_INT:
@@ -546,6 +549,8 @@ def compile_program(program):
                 out.write("    test rax, rax\n")
                 out.write("    jz addr_%d\n" % op["jump_to"])
             elif op["action"] == OP_ELSE:
+                out.write("    jmp addr_%d\n" % op["jump_to"])
+            elif op["action"] == OP_FI:
                 out.write("    jmp addr_%d\n" % op["jump_to"])
             elif op["action"] == OP_DO:
                 pass
