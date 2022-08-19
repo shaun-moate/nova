@@ -51,10 +51,14 @@ OP_SYSCALL   = iota()
 OP_EXIT      = iota()
 OP_COUNT     = iota()
 
+MACRO_WRITE  = iota(True)
+MACRO_COUNT  = iota()
+
 CONST_CATCH  = iota(True)
 CONST_COUNT  = iota()
 
 TOKEN_OP     = iota(True)
+TOKEN_MACRO  = iota()
 TOKEN_CONST  = iota()
 TOKEN_INT    = iota()
 TOKEN_STR    = iota()
@@ -98,6 +102,11 @@ BUILTIN_OPS = {
     "exit": OP_EXIT
 }
 
+assert MACRO_COUNT == 1, "Exhaustive list of macros"
+BUILTIN_MACRO = {
+    "write": [1, 1, 'syscall'],
+}
+
 assert CONST_COUNT == 1, "Exhaustive list of constants"
 BUILTIN_CONST = {
     "CATCH": 22,
@@ -106,13 +115,19 @@ BUILTIN_CONST = {
 def parse_token_as_op(token):
     location = token["location"]
     word = token["value"]
-    assert TOKEN_COUNT == 4, "Exhaustive list of operands in parse_word()"
+    assert TOKEN_COUNT == 5, "Exhaustive list of operands in parse_word()"
     if token["type"] == TOKEN_OP:
         if token["value"] in BUILTIN_OPS:
             return {"action": BUILTIN_OPS[token["value"]], "location": token["location"], "value": token["value"]}
         else:
             print("%s:%d:%d: ERROR: unknown operand `%s` found" % (token["location"] + (token["value"], )))
             exit(1)
+    elif token["type"] == TOKEN_MACRO:
+        macro = token["value"]
+        return [{"action": action,
+                 "location": "",
+                 "value": value}
+                for (action, value) in parse_macro(macro)]
     elif token["type"] == TOKEN_CONST:
         if token["value"] in BUILTIN_CONST:
             return {"action": OP_PUSH_INT, "location": token["location"], "value": int(BUILTIN_CONST[token["value"]])}
@@ -122,6 +137,18 @@ def parse_token_as_op(token):
         return {"action": OP_PUSH_STR, "location": token["location"], "value": token["value"]}
     else:
         assert False, "Token type is unreachable is unreachable"
+
+def parse_macro(macro):
+    instructions = BUILTIN_MACRO[macro]
+    if macro in BUILTIN_MACRO:
+        for i in instructions:
+            if parse_word(i)[0] == TOKEN_OP:
+                if i in BUILTIN_OPS:
+                    yield(BUILTIN_OPS[i], i)
+                else:
+                    assert False, "ERROR: `%s` not found in BUILTIN_OPS" % i
+            elif parse_word(i)[0] == TOKEN_INT:
+                yield(OP_PUSH_INT, int(i))
 
 def parse_program_from_file(input_file_path):
     with open(input_file_path, "r") as file:
@@ -143,7 +170,30 @@ def parse_line(line):
         if line[start] == "\"":
             end = find_next(line, start+1, lambda x: x == "\"")
             yield(start, parse_word(line[start+1:end], typ="str"))
+        elif line[start:find_next(line, start, lambda x: x.isspace())] == "macro":
+            ## TODO: clean up this code, DISGUSTING!
+            end = find_next(line, start, lambda x: x.isspace())
+            start = find_next(line, end+1, lambda x: not x.isspace())
+            end = find_next(line, start, lambda x: x.isspace())
+            key = line[start:end]
+            if key in BUILTIN_MACRO:
+                print("ERROR: attempting to override a built-in macro `%s` - not permitted" % key)
+                exit(1)
+            val_stack = []
+            start = find_next(line, end+1, lambda x: not x.isspace())
+            while line[start:find_next(line, start, lambda x: x.isspace())] != "end":
+                end = find_next(line, start, lambda x: x.isspace())
+                assert parse_word(line[start:end])[0] == TOKEN_OP or parse_word(line[start:end])[0] == TOKEN_INT, "ERROR: macro op value must be of type operation or integer"
+                val_stack.append(line[start:end])
+                start = find_next(line, end+1, lambda x: not x.isspace())
+            BUILTIN_MACRO[key] = val_stack
+            end = find_next(line, start, lambda x: x.isspace())
+            start = find_next(line, end+1, lambda x: not x.isspace())
+        elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_MACRO:
+            end = find_next(line, start, lambda x: x.isspace())
+            yield(start, parse_word(line[start:end], typ="macro"))
         elif line[start:find_next(line, start, lambda x: x.isspace())] == "const":
+            ## TODO: clean up this code, DISGUSTING!
             end = find_next(line, start, lambda x: x.isspace())
             start = find_next(line, end+1, lambda x: not x.isspace())
             end = find_next(line, start, lambda x: x.isspace())
@@ -165,9 +215,11 @@ def parse_line(line):
         start = find_next(line, end+1, lambda x: not x.isspace())
 
 def parse_word(token, typ=None):
-    assert TOKEN_COUNT == 4, "Exhaustive list of operands in parse_word()"
+    assert TOKEN_COUNT == 5, "Exhaustive list of operands in parse_word()"
     if typ == "str":
         return (TOKEN_STR, bytes(token, "utf-8").decode("unicode_escape"))
+    elif typ == "macro":
+        return (TOKEN_MACRO, token)
     elif typ == "const":
         return (TOKEN_CONST, token)
     else:
@@ -181,8 +233,19 @@ def find_next(line, start, predicate):
         start += 1
     return start
 
+def unnest_program(program):
+    result = []
+    for i in range(len(program)):
+        if type(program[i]) is list:
+            for j in range(len(program[i])):
+                result.append(program[i][j])
+        else:
+            result.append(program[i])
+    return result
+
 def generate_blocks(program):
     block = []
+    program = unnest_program(program)
     for ip in range(len(program)):
         assert OP_COUNT == 33, "Exhaustive list of operands in generate_blocks() -> Note: only operands that generate a block need to be included."
         if program[ip]["action"] == OP_IF:
@@ -211,7 +274,7 @@ def generate_blocks(program):
             program[ref]["action"] = OP_DO
             program[ref]["jump_to"] = ip+1
         if program[ip]["action"] == OP_END:
-            assert False, "not implemented"
+           pass
     return program
 
 def simulate_program(program):
@@ -358,7 +421,7 @@ def simulate_program(program):
             ip = op["jump_to"]
             ip += 1
         elif op["action"] == OP_END:
-            assert False, "not implemented"
+            ip += 1
         elif op["action"] == OP_MEM_ADDR:
             stack.append(STR_ALLOCATION_SIZE)
             ip += 1

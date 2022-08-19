@@ -1,0 +1,4 @@
+// create a macro and apply it
+macro write69 69 dump end
+
+write69
