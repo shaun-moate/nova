@@ -26,7 +26,7 @@ mem INITIAL_CELL + 1 store8
 
   // add `\n` to end of line and print out
   mem + BOARD_WIDTH + NEW_LINE store8
-  BOARD_WIDTH 1 + mem BOARD_WIDTH + 1 1 syscall
+  BOARD_WIDTH 1 + mem BOARD_WIDTH + write
 
   // pattern reference
   mem 0 + load8 1 shl
