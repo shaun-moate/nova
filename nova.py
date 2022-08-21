@@ -102,6 +102,7 @@ BUILTIN_OPS = {
     "exit": OP_EXIT
 }
 
+## TODO: add MACROS to examples to improve readability -> ie. rule110.nv
 assert MACRO_COUNT == 1, "Exhaustive list of macros"
 BUILTIN_MACRO = {
     "write": [1, 1, 'syscall'],
@@ -171,41 +172,23 @@ def parse_line(line):
             end = find_next(line, start+1, lambda x: x == "\"")
             yield(start, parse_word(line[start+1:end], typ="str"))
         elif line[start:find_next(line, start, lambda x: x.isspace())] == "macro":
-            ## TODO: clean up this code, DISGUSTING!
-            end = find_next(line, start, lambda x: x.isspace())
-            start = find_next(line, end+1, lambda x: not x.isspace())
-            end = find_next(line, start, lambda x: x.isspace())
-            key = line[start:end]
-            if key in BUILTIN_MACRO:
-                print("ERROR: attempting to override a built-in macro `%s` - not permitted" % key)
+            (name, start, end) = parse_name(line, start)
+            if name in BUILTIN_MACRO:
+                print("ERROR: attempting to override a built-in macro `%s` - not permitted" % name)
                 exit(1)
-            val_stack = []
-            start = find_next(line, end+1, lambda x: not x.isspace())
-            while line[start:find_next(line, start, lambda x: x.isspace())] != "end":
-                end = find_next(line, start, lambda x: x.isspace())
-                assert parse_word(line[start:end])[0] == TOKEN_OP or parse_word(line[start:end])[0] == TOKEN_INT, "ERROR: macro op value must be of type operation or integer"
-                val_stack.append(line[start:end])
-                start = find_next(line, end+1, lambda x: not x.isspace())
-            BUILTIN_MACRO[key] = val_stack
-            end = find_next(line, start, lambda x: x.isspace())
+            (macro_stack, start, end) = parse_macro_stack(line, start, end)
+            BUILTIN_MACRO[name] = macro_stack
             start = find_next(line, end+1, lambda x: not x.isspace())
         elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_MACRO:
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end], typ="macro"))
         elif line[start:find_next(line, start, lambda x: x.isspace())] == "const":
-            ## TODO: clean up this code, DISGUSTING!
-            end = find_next(line, start, lambda x: x.isspace())
-            start = find_next(line, end+1, lambda x: not x.isspace())
-            end = find_next(line, start, lambda x: x.isspace())
-            key = line[start:end]
-            if key in BUILTIN_CONST:
-                print("ERROR: attempting to override a built-in constant `%s` - not permitted" % key)
+            (name, start, end) = parse_name(line, start)
+            if name in BUILTIN_CONST:
+                print("ERROR: attempting to override a built-in constant `%s` - not permitted" % name)
                 exit(1)
-            start = find_next(line, end+1, lambda x: not x.isspace())
-            end = find_next(line, start, lambda x: x.isspace())
-            value = line[start:end]
-            assert int(value), "ERROR: const value must be of type integer"
-            BUILTIN_CONST[key] = value
+            (value, start, end) = parse_const_int(line, start, end)
+            BUILTIN_CONST[name] = value
         elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_CONST:
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end], typ="const"))
@@ -213,6 +196,30 @@ def parse_line(line):
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end]))
         start = find_next(line, end+1, lambda x: not x.isspace())
+
+def parse_name(line, start):
+    skip_end = find_next(line, start, lambda x: x.isspace())
+    start_next = find_next(line, skip_end+1, lambda x: not x.isspace())
+    end_next = find_next(line, start_next, lambda x: x.isspace())
+    return (line[start_next:end_next], start_next, end_next)
+
+def parse_macro_stack(line, start, end):
+    macro_stack = []
+    start = find_next(line, end+1, lambda x: not x.isspace())
+    while line[start:find_next(line, start, lambda x: x.isspace())] != "end":
+        end = find_next(line, start, lambda x: x.isspace())
+        assert parse_word(line[start:end])[0] == TOKEN_OP or parse_word(line[start:end])[0] == TOKEN_INT, "ERROR: macro op value must be of type operation or integer"
+        macro_stack.append(line[start:end])
+        start = find_next(line, end+1, lambda x: not x.isspace())
+    end = find_next(line, start, lambda x: x.isspace())
+    return (macro_stack, start, end)
+
+def parse_const_int(line, start, end):
+    start = find_next(line, end+1, lambda x: not x.isspace())
+    end = find_next(line, start, lambda x: x.isspace())
+    value = line[start:end]
+    assert int(value), "ERROR: const value must be of type integer"
+    return (value, start, end)
 
 def parse_word(token, typ=None):
     assert TOKEN_COUNT == 5, "Exhaustive list of operands in parse_word()"
