@@ -6,7 +6,6 @@ import subprocess
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import List, Union
-## TODO: introduce @dataclass to migrate away from dictionaries to Op, Program etc. classes (helping with type checking and readability)
 
 iota_counter = 0
 
@@ -70,6 +69,8 @@ assert len(OperandId) == 33, "Exhaustive list of operands"
 ## TODO: add `{` and `}` as operands to help segment blocks and improve readability
 ## TODO: add `(` and `)` as operands to help with math ordering`
 BUILTIN_OPS = {
+    "int":     OperandId.PUSH_INT,
+    "str":     OperandId.PUSH_STR,
     "+":       OperandId.PLUS,
     "-":       OperandId.MINUS,
     "*":       OperandId.MULT,
@@ -130,6 +131,7 @@ class Token:
 class Operand:
     action:    OperandId
     jump_to:   int
+    mem_addr:  int
     location:  FileLocation
     value:     Union[int, str]
 
@@ -140,40 +142,40 @@ class Program:
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r") as file:
         return generate_blocks(
-                    [parse_token_as_op(token) for token in parse_tokens_from_file(input_file_path)]
+                    Program(operands = [parse_token_as_op(token) for token in parse_tokens_from_file(input_file_path)])
                 )
 
-def generate_blocks(program) -> Program:
+def generate_blocks(program: Program) -> Program:
     block = []
     program = unnest_program(program)
-    for ip in range(len(program)):
+    for ip in range(len(program.operands)):
         assert len(OperandId) == 33, "Exhaustive list of operands"
-        if program[ip]["action"] == OperandId.IF:
+        if program.operands[ip].action == OperandId.IF:
             block.append(ip)
-        if program[ip]["action"] == OperandId.ELSE:
+        if program.operands[ip].action == OperandId.ELSE:
             ref = block.pop()
-            assert program[ref]["action"] == OperandId.IF, "ERROR: `else` can only be used in `if` blocks"
-            program[ref]["action"] = OperandId.IF
-            program[ref]["jump_to"] = ip+1
+            assert program.operands[ref].action == OperandId.IF, "ERROR: `else` can only be used in `if` blocks"
+            program.operands[ref].action = OperandId.IF
+            program.operands[ref].jump_to = ip+1
             block.append(ip)
-        if program[ip]["action"] == OperandId.FI:
+        if program.operands[ip].action == OperandId.FI:
             ref = block.pop()
-            assert program[ref]["action"] == OperandId.IF or program[ref]["action"] == OperandId.ELSE, "ERROR: `fi` is expected to end the blocks for `if` or `else` only"
-            program[ip]["jump_to"] = ip+1
-            program[ref]["jump_to"] = ip
-        if program[ip]["action"] == OperandId.WHILE:
+            assert program.operands[ref].action == OperandId.IF or program.operands[ref].action == OperandId.ELSE, "ERROR: `fi` is expected to end the blocks for `if` or `else` only"
+            program.operands[ip].jump_to = ip+1
+            program.operands[ref].jump_to = ip
+        if program.operands[ip].action == OperandId.WHILE:
             block.append(ip)
-        if program[ip]["action"] == OperandId.DO:
+        if program.operands[ip].action == OperandId.DO:
             ref = block.pop()
-            assert program[ref]["action"] == OperandId.WHILE, "ERROR: `do` can only be used in `while` blocks"
-            program[ip]["jump_to"] = ref
+            assert program.operands[ref].action == OperandId.WHILE, "ERROR: `do` can only be used in `while` blocks"
+            program.operands[ip].jump_to = ref
             block.append(ip)
-        if program[ip]["action"] == OperandId.DONE:
+        if program.operands[ip].action == OperandId.DONE:
             ref = block.pop()
-            program[ip]["jump_to"] = program[ref]["jump_to"]
-            program[ref]["action"] = OperandId.DO
-            program[ref]["jump_to"] = ip+1
-        if program[ip]["action"] == OperandId.END:
+            program.operands[ip].jump_to = program.operands[ref].jump_to
+            program.operands[ref].action = OperandId.DO
+            program.operands[ref].jump_to = ip+1
+        if program.operands[ip].action == OperandId.END:
            pass
     return program
 
@@ -183,23 +185,41 @@ def parse_token_as_op(token: TokenId):
     assert len(TokenId) == 5, "Exhaustive list of operands in parse_word()"
     if token.typ == TokenId.OP:
         if token.value in BUILTIN_OPS:
-            return {"action": BUILTIN_OPS[token.value], "location": token.location, "value": token.value}
+            return Operand(action   = BUILTIN_OPS[token.value],
+                           jump_to  = -1,
+                           mem_addr = -1,
+                           location = token.location,
+                           value    = token.value)
         else:
             print("%s:%d:%d: ERROR: unknown operand `%s` found" % (token.location + (token.value, )))
             exit(1)
     elif token.typ == TokenId.MACRO:
         macro = token.value
-        return [{"action": action,
-                 "location": "",
-                 "value": value}
+        return [Operand(action   = action,
+                        jump_to  = -1,
+                        mem_addr = -1,
+                        location = token.location,
+                        value    = value)
                 for (action, value) in parse_macro(macro)]
     elif token.typ == TokenId.CONST:
         if token.value in BUILTIN_CONST:
-            return {"action": OperandId.PUSH_INT, "location": token.location, "value": int(BUILTIN_CONST[token.value])}
+            return Operand(action   = OperandId.PUSH_INT,
+                           jump_to  = -1,
+                           mem_addr = -1,
+                           location = token.location,
+                           value    = BUILTIN_CONST[token.value])
     elif token.typ == TokenId.INT:
-        return {"action": OperandId.PUSH_INT, "location": token.location, "value": token.value}
+        return Operand(action   = OperandId.PUSH_INT,
+                       jump_to  = -1,
+                       mem_addr = -1,
+                       location = token.location,
+                       value    = token.value)
     elif token.typ == TokenId.STR:
-        return {"action": OperandId.PUSH_STR, "location": token.location, "value": token.value}
+        return Operand(action   = OperandId.PUSH_STR,
+                       jump_to  = -1,
+                       mem_addr = -1,
+                       location = token.location,
+                       value    = token.value)
     else:
         assert False, "TokenId type is unreachable is unreachable"
 
@@ -211,7 +231,7 @@ def parse_tokens_from_file(input_file_path: str) -> Token:
                 for (row, line) in enumerate(file.readlines())
                 for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
 
-def parse_macro(macro):
+def parse_macro(macro: List[Token]) -> Token:
     instructions = BUILTIN_MACRO[macro]
     if macro in BUILTIN_MACRO:
         for i in instructions:
@@ -300,63 +320,64 @@ def find_next(line: int, start: int, predicate: int) -> int:
 
 def unnest_program(program: Program) -> Program:
     result = []
-    for i in range(len(program)):
-        if type(program[i]) is list:
-            for j in range(len(program[i])):
-                result.append(program[i][j])
+    for i in range(len(program.operands)):
+        if type(program.operands[i]) is list:
+            for j in range(len(program.operands[i])):
+                result.append(program.operands[i][j])
         else:
-            result.append(program[i])
-    return result
+            result.append(program.operands[i])
+    program.operands = result
+    return program
 
 def simulate_program(program):
     stack = []
     mem = bytearray(MEM_ALLOCATION_SIZE + STR_ALLOCATION_SIZE)
     str_addr_start = 0
     ip = 0
-    while ip < len(program):
+    while ip < len(program.operands):
         assert len(OperandId) == 33, "Exhaustive list of operands in simulate_program()"
-        op = program[ip]
-        if op["action"] == OperandId.PUSH_INT:
-            stack.append(op["value"])
+        op = program.operands[ip]
+        if op.action == OperandId.PUSH_INT:
+            stack.append(op.value)
             ip += 1
-        elif op["action"] == OperandId.PUSH_STR:
-            str_bytes = bytes(op["value"], "utf-8")
+        elif op.action == OperandId.PUSH_STR:
+            str_bytes = bytes(op.value, "utf-8")
             str_length = len(str_bytes)
-            if "address" not in op:
-                op["address"] = str_addr_start
+            if op.mem_addr == -1:
+                op.mem_addr = str_addr_start
                 for i in reversed(range(str_length)):
                     mem[str_addr_start+i] = str_bytes[i]
                 str_addr_start += str_length
                 assert str_addr_start <= STR_ALLOCATION_SIZE, "ERROR: String buffer overflow"
             stack.append(str_length)
-            stack.append(op["address"])
+            stack.append(op.mem_addr)
             ip += 1
-        elif op["action"] == OperandId.OVER:
+        elif op.action == OperandId.OVER:
             x = stack.pop()
             y = stack.pop()
             stack.append(y)
             stack.append(x)
             stack.append(y)
             ip += 1
-        elif op["action"] == OperandId.SWAP:
+        elif op.action == OperandId.SWAP:
             x = stack.pop()
             y = stack.pop()
             stack.append(x)
             stack.append(y)
             ip += 1
-        elif op["action"] == OperandId.DROP:
+        elif op.action == OperandId.DROP:
             stack.pop()
             ip += 1
-        elif op["action"] == OperandId.DUMP:
+        elif op.action == OperandId.DUMP:
             x = stack.pop()
             print(x)
             ip += 1
-        elif op["action"] == OperandId.DUP:
+        elif op.action == OperandId.DUP:
             x = stack.pop()
             stack.append(x)
             stack.append(x)
             ip += 1
-        elif op["action"] == OperandId.DUP2:
+        elif op.action == OperandId.DUP2:
             x = stack.pop()
             y = stack.pop()
             stack.append(y)
@@ -364,109 +385,106 @@ def simulate_program(program):
             stack.append(y)
             stack.append(x)
             ip += 1
-        elif op["action"] == OperandId.SHL:
+        elif op.action == OperandId.SHL:
             x = stack.pop()
             y = stack.pop()
             stack.append(y << x)
             ip += 1
-        elif op["action"] == OperandId.SHR:
+        elif op.action == OperandId.SHR:
             x = stack.pop()
             y = stack.pop()
             stack.append(y >> x)
             ip += 1
-        elif op["action"] == OperandId.BAND:
+        elif op.action == OperandId.BAND:
             x = stack.pop()
             y = stack.pop()
             stack.append(y & x)
             ip += 1
-        elif op["action"] == OperandId.BOR:
+        elif op.action == OperandId.BOR:
             x = stack.pop()
             y = stack.pop()
             stack.append(y | x)
             ip += 1
-        elif op["action"] == OperandId.PLUS:
+        elif op.action == OperandId.PLUS:
             x = stack.pop()
             y = stack.pop()
             stack.append(x + y)
             ip += 1
-        elif op["action"] == OperandId.MINUS:
+        elif op.action == OperandId.MINUS:
             x = stack.pop()
             y = stack.pop()
             stack.append(y - x)
             ip += 1
-        elif op["action"] == OperandId.MULT:
+        elif op.action == OperandId.MULT:
             x = stack.pop()
             y = stack.pop()
             stack.append(y * x)
             ip += 1
-        elif op["action"] == OperandId.EQUAL:
+        elif op.action == OperandId.EQUAL:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y == x))
             ip += 1
-        elif op["action"] == OperandId.NOT_EQUAL:
+        elif op.action == OperandId.NOT_EQUAL:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y != x))
             ip += 1
-        elif op["action"] == OperandId.GREATER:
+        elif op.action == OperandId.GREATER:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y > x))
             ip += 1
-        elif op["action"] == OperandId.GR_EQ:
+        elif op.action == OperandId.GR_EQ:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y >= x))
             ip += 1
-        elif op["action"] == OperandId.LESSER:
+        elif op.action == OperandId.LESSER:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y < x))
             ip += 1
-        elif op["action"] == OperandId.LESS_EQ:
+        elif op.action == OperandId.LESS_EQ:
             x = stack.pop()
             y = stack.pop()
             stack.append(int(y <= x))
             ip += 1
-        elif op["action"] == OperandId.IF:
-            assert len(op) > 1, "ERROR: `if` block has no referenced `else` or `end`"
+        elif op.action == OperandId.IF:
             if stack.pop() == 0:
-                ip = op["jump_to"]
+                ip = op.jump_to
             else:
                 ip += 1
-        elif op["action"] == OperandId.ELSE:
-            assert len(op) > 1, "ERROR: `else` block has no referenced `end`"
-            ip = op["jump_to"]
-        elif op["action"] == OperandId.FI:
-            ip = op["jump_to"]
-        elif op["action"] == OperandId.WHILE:
+        elif op.action == OperandId.ELSE:
+            ip = op.jump_to
+        elif op.action == OperandId.FI:
+            ip = op.jump_to
+        elif op.action == OperandId.WHILE:
             ip += 1
-        elif op["action"] == OperandId.DO:
-            assert len(op) > 1, "ERROR: `while` block has no referenced `done`"
+        elif op.action == OperandId.DO:
             if stack.pop() == 0:
-                ip = op["jump_to"]
+                ip = op.jump_to
             else:
                 ip += 1
-        elif op["action"] == OperandId.DONE:
-            ip = op["jump_to"]
+        elif op.action == OperandId.DONE:
+            ip = op.jump_to
             ip += 1
-        elif op["action"] == OperandId.END:
+        elif op.action == OperandId.END:
             ip += 1
-        elif op["action"] == OperandId.MEM_ADDR:
+        elif op.action == OperandId.MEM_ADDR:
             stack.append(STR_ALLOCATION_SIZE)
             ip += 1
-        elif op["action"] == OperandId.MEM_STORE:
+        elif op.action == OperandId.MEM_STORE:
             byte = stack.pop()
             addr = stack.pop()
             mem[addr] = byte & 0xFF
             ip += 1
-        elif op["action"] == OperandId.MEM_LOAD:
+        elif op.action == OperandId.MEM_LOAD:
             addr = stack.pop()
             byte = mem[addr]
             stack.append(byte)
             ip += 1
-        elif op["action"] == OperandId.SYSCALL:
+        elif op.action == OperandId.SYSCALL:
             syscall_num = stack.pop()
             arg1 = stack.pop()
             arg2 = stack.pop()
@@ -474,7 +492,7 @@ def simulate_program(program):
             if syscall_num == 1:
                 print(mem[arg2:arg2+arg3].decode("utf-8"), end="")
             ip += 1
-        elif op["action"] == OperandId.EXIT:
+        elif op.action == OperandId.EXIT:
             x = stack.pop()
             exit(x)
             ip += 1
@@ -520,81 +538,81 @@ def compile_program(program):
         out.write("    ret\n")
 
         out.write("global _start\n_start:\n")
-        for ip in range(len(program)):
+        for ip in range(len(program.operands)):
             assert len(OperandId) == 33, "Exhaustive list of operands in compile_program()"
-            op = program[ip]
+            op = program.operands[ip]
             out.write("addr_%d:\n" % ip)
-            if op["action"] == OperandId.PUSH_INT:
-                out.write("    push %d\n" % op["value"])
-            elif op["action"] == OperandId.PUSH_STR:
-                str_bytes = bytes(op["value"], "utf-8")
-                out.write("    mov rax, %d\n" % len(bytes(op["value"], "utf-8")))
+            if op.action == OperandId.PUSH_INT:
+                out.write("    push %d\n" % int(op.value))
+            elif op.action == OperandId.PUSH_STR:
+                str_bytes = bytes(op.value, "utf-8")
+                out.write("    mov rax, %d\n" % len(bytes(op.value, "utf-8")))
                 out.write("    push rax\n")
                 out.write("    push str_%d\n" % len(str_stack))
                 str_stack.append(str_bytes)
-            elif op["action"] == OperandId.OVER:
+            elif op.action == OperandId.OVER:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    push rbx\n")
                 out.write("    push rax\n")
                 out.write("    push rbx\n")
-            elif op["action"] == OperandId.SWAP:
+            elif op.action == OperandId.SWAP:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    push rax\n")
                 out.write("    push rbx\n")
-            elif op["action"] == OperandId.DROP:
+            elif op.action == OperandId.DROP:
                 out.write("    pop rax\n")
-            elif op["action"] == OperandId.DUMP:
+            elif op.action == OperandId.DUMP:
                 out.write("    pop rdi\n")
                 out.write("    call dump\n")
-            elif op["action"] == OperandId.DUP:
+            elif op.action == OperandId.DUP:
                 out.write("    pop rax\n")
                 out.write("    push rax\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.DUP2:
+            elif op.action == OperandId.DUP2:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    push rbx\n")
                 out.write("    push rax\n")
                 out.write("    push rbx\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.SHL:
+            elif op.action == OperandId.SHL:
                 out.write("    pop rcx\n")
                 out.write("    pop rax\n")
                 out.write("    shl rax, cl\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.SHR:
+            elif op.action == OperandId.SHR:
                 out.write("    pop rcx\n")
                 out.write("    pop rax\n")
                 out.write("    shr rax, cl\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.BAND:
+            elif op.action == OperandId.BAND:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    and rax, rbx\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.BOR:
+            elif op.action == OperandId.BOR:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    or rax, rbx\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.PLUS:
+            elif op.action == OperandId.PLUS:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    add rax, rbx\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.MINUS:
+            elif op.action == OperandId.MINUS:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    sub rbx, rax\n")
                 out.write("    push rbx\n")
-            elif op["action"] == OperandId.MULT:
+            elif op.action == OperandId.MULT:
                 out.write("    pop rax\n")
                 out.write("    pop rbx\n")
                 out.write("    mul rbx\n")
                 out.write("    push rax\n")
-            elif op["action"] == OperandId.EQUAL:
+            elif op.action == OperandId.EQUAL:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
@@ -602,7 +620,7 @@ def compile_program(program):
                 out.write("    cmp rax, rbx\n")
                 out.write("    cmove rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op["action"] == OperandId.NOT_EQUAL:
+            elif op.action == OperandId.NOT_EQUAL:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
@@ -610,7 +628,7 @@ def compile_program(program):
                 out.write("    cmp rax, rbx\n")
                 out.write("    cmovne rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op["action"] == OperandId.GREATER:
+            elif op.action == OperandId.GREATER:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
@@ -618,7 +636,7 @@ def compile_program(program):
                 out.write("    cmp rbx, rax\n")
                 out.write("    cmovg rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op["action"] == OperandId.GR_EQ:
+            elif op.action == OperandId.GR_EQ:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
@@ -626,7 +644,7 @@ def compile_program(program):
                 out.write("    cmp rbx, rax\n")
                 out.write("    cmovge rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op["action"] == OperandId.LESSER:
+            elif op.action == OperandId.LESSER:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
@@ -634,7 +652,7 @@ def compile_program(program):
                 out.write("    cmp rbx, rax\n")
                 out.write("    cmovl rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op["action"] == OperandId.LESS_EQ:
+            elif op.action == OperandId.LESS_EQ:
                 out.write("    mov rcx, 0\n")
                 out.write("    mov rdx, 1\n")
                 out.write("    pop rax\n")
@@ -642,50 +660,48 @@ def compile_program(program):
                 out.write("    cmp rbx, rax\n")
                 out.write("    cmovle rcx, rdx\n")
                 out.write("    push rcx\n")
-            elif op["action"] == OperandId.IF:
-                assert len(op) > 1, "ERROR: `if` block has no referenced `end`"
+            elif op.action == OperandId.IF:
                 out.write("    pop rax\n")
                 out.write("    test rax, rax\n")
-                out.write("    jz addr_%d\n" % op["jump_to"])
-            elif op["action"] == OperandId.ELSE:
-                out.write("    jmp addr_%d\n" % op["jump_to"])
-            elif op["action"] == OperandId.FI:
-                out.write("    jmp addr_%d\n" % op["jump_to"])
-            elif op["action"] == OperandId.WHILE:
+                out.write("    jz addr_%d\n" % op.jump_to)
+            elif op.action == OperandId.ELSE:
+                out.write("    jmp addr_%d\n" % op.jump_to)
+            elif op.action == OperandId.FI:
+                out.write("    jmp addr_%d\n" % op.jump_to)
+            elif op.action == OperandId.WHILE:
                 pass
-            elif op["action"] == OperandId.DO:
-                assert len(op) > 1, "ERROR: `do` block has no referenced `end`"
+            elif op.action == OperandId.DO:
                 out.write("    pop rax\n")
                 out.write("    test rax, rax\n")
-                out.write("    jz addr_%d\n" % op["jump_to"])
-            elif op["action"] == OperandId.DONE:
-                out.write("    jmp addr_%d\n" % op["jump_to"])
-            elif op["action"] == OperandId.END:
+                out.write("    jz addr_%d\n" % op.jump_to)
+            elif op.action == OperandId.DONE:
+                out.write("    jmp addr_%d\n" % op.jump_to)
+            elif op.action == OperandId.END:
                 assert False, "not implemented"
-            elif op["action"] == OperandId.MEM_ADDR:
+            elif op.action == OperandId.MEM_ADDR:
                 out.write("    push mem\n")
-            elif op["action"] == OperandId.MEM_STORE:
+            elif op.action == OperandId.MEM_STORE:
                 out.write("    pop rbx\n")
                 out.write("    pop rax\n")
                 out.write("    mov [rax], bl\n")
-            elif op["action"] == OperandId.MEM_LOAD:
+            elif op.action == OperandId.MEM_LOAD:
                 out.write("    pop rax\n")
                 out.write("    xor rbx, rbx\n")
                 out.write("    mov bl, [rax]\n")
                 out.write("    push rbx\n")
-            elif op["action"] == OperandId.SYSCALL:
+            elif op.action == OperandId.SYSCALL:
                 out.write("    pop rax\n")
                 out.write("    pop rdi\n")
                 out.write("    pop rsi\n")
                 out.write("    pop rdx\n")
                 out.write("    syscall\n")
-            elif op["action"] == OperandId.EXIT:
+            elif op.action == OperandId.EXIT:
                 out.write("    mov rax, 60\n")
                 out.write("    pop rdi\n")
                 out.write("    syscall\n")
             else:
                 assert False, "Operands is unreachable"
-        out.write("addr_%d:\n" % len(program))
+        out.write("addr_%d:\n" % len(program.operands))
         out.write("    mov rax, 60\n")
         out.write("    mov rdi, 0\n")
         out.write("    syscall\n")
