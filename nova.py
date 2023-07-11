@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
-## TODO: implement tox/poetry to manage virtual environment for python
 
+from nova.helpers import uncons
 import sys
 import subprocess
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Union, Sized
-
-iota_counter = 0
-
-def uncons(xs):
-    return (xs[0], xs[1:])
+from typing import List, Union
 
 ## TODO: Add OP_ASSERT to support testing framework - enabling us to ensure we can assert() the expected correct result
 class OperandId(Enum):
