@@ -5,7 +5,7 @@ import sys
 import subprocess
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Union
+from typing import List, Union, Sized
 
 iota_counter = 0
 
@@ -125,7 +125,7 @@ class FileLocation:
 class Token:
     typ:       TokenId
     location:  FileLocation
-    value:     Union[int, str]
+    value:     Union[int, str, None]
 
 @dataclass
 class Operand:
@@ -133,16 +133,23 @@ class Operand:
     jump_to:   int
     mem_addr:  int
     location:  FileLocation
-    value:     Union[int, str]
+    value:     int | str | None
+    def __getitem__(self, index):
+        return self[index]
+    def __len__(self):
+        return len(self)
 
 @dataclass
 class Program:
     operands: List[Operand] = field(default_factory=list)
+    def __len__(self):
+        return len(self)
 
 def parse_program_from_file(input_file_path: str) -> Program:
-    with open(input_file_path, "r") as file:
+    with open(input_file_path, "r"):
         return generate_blocks(
-                    Program(operands = [parse_token_as_op(token) for token in parse_tokens_from_file(input_file_path)])
+                    Program(operands = [parse_token_as_op(token) 
+                                        for token in parse_tokens_from_file(input_file_path)])
                 )
 
 def generate_blocks(program: Program) -> Program:
@@ -179,28 +186,26 @@ def generate_blocks(program: Program) -> Program:
            pass
     return program
 
-def parse_token_as_op(token: TokenId):
+def parse_token_as_op(token: Token):
     location = token.location
-    word = token.value
     assert len(TokenId) == 5, "Exhaustive list of operands in parse_word()"
     if token.typ == TokenId.OP:
         if token.value in BUILTIN_OPS:
             return Operand(action   = BUILTIN_OPS[token.value],
                            jump_to  = -1,
                            mem_addr = -1,
-                           location = token.location,
+                           location = location,
                            value    = token.value)
         else:
-            print("%s:%d:%d: ERROR: unknown operand `%s` found" % (token.location + (token.value, )))
+            print("%s:%d:%d: ERROR: unknown operand `%s` found".format(token.location, (token.value, )))
             exit(1)
     elif token.typ == TokenId.MACRO:
-        macro = token.value
         return [Operand(action   = action,
                         jump_to  = -1,
                         mem_addr = -1,
                         location = token.location,
                         value    = value)
-                for (action, value) in parse_macro(macro)]
+                for (action, value) in parse_macro(token.value)]
     elif token.typ == TokenId.CONST:
         if token.value in BUILTIN_CONST:
             return Operand(action   = OperandId.PUSH_INT,
@@ -223,7 +228,7 @@ def parse_token_as_op(token: TokenId):
     else:
         assert False, "TokenId type is unreachable is unreachable"
 
-def parse_tokens_from_file(input_file_path: str) -> Token:
+def parse_tokens_from_file(input_file_path: str):
     with open(input_file_path, "r") as file:
         return [Token(typ      = token_type,
                       location = FileLocation(input_file_path, row+1, col+1),
@@ -231,7 +236,7 @@ def parse_tokens_from_file(input_file_path: str) -> Token:
                 for (row, line) in enumerate(file.readlines())
                 for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
 
-def parse_macro(macro: List[Token]) -> Token:
+def parse_macro(macro):
     instructions = BUILTIN_MACRO[macro]
     if macro in BUILTIN_MACRO:
         for i in instructions:
@@ -244,12 +249,12 @@ def parse_macro(macro: List[Token]) -> Token:
                 yield(OperandId.PUSH_INT, int(i))
 
 def parse_line(line: str):
-    start = find_next(line, 0, lambda x: not x.isspace())
+    start = find_next(line, 0, lambda x : not x.isspace())
     while start < len(line):
         if line[start] == "\"":
-            end = find_next(line, start+1, lambda x: x == "\"")
+            end = find_next(line, start+1, lambda x : x == "\"")
             yield(start, parse_word(line[start+1:end], typ="str"))
-        elif line[start:find_next(line, start, lambda x: x.isspace())] == "macro":
+        elif line[start:find_next(line, start, lambda x : x.isspace())] == "macro":
             (name, start, end) = parse_name(line, start)
             if name in BUILTIN_MACRO:
                 print("ERROR: attempting to override a built-in macro `%s` - not permitted" % name)
@@ -266,7 +271,7 @@ def parse_line(line: str):
                 print("ERROR: attempting to override a built-in constant `%s` - not permitted" % name)
                 exit(1)
             (value, start, end) = parse_const_int(line, start, end)
-            BUILTIN_CONST[name] = value
+            BUILTIN_CONST[name] = int(value)
         elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_CONST:
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end], typ="const"))
@@ -275,7 +280,7 @@ def parse_line(line: str):
             yield(start, parse_word(line[start:end]))
         start = find_next(line, end+1, lambda x: not x.isspace())
 
-def parse_name(line, start):
+def parse_name(line: str, start: int):
     skip_end = find_next(line, start, lambda x: x.isspace())
     start_next = find_next(line, skip_end+1, lambda x: not x.isspace())
     end_next = find_next(line, start_next, lambda x: x.isspace())
@@ -299,7 +304,7 @@ def parse_const_int(line, start, end):
     assert int(value), "ERROR: const value must be of type integer"
     return (value, start, end)
 
-def parse_word(token: TokenId, typ=None):
+def parse_word(token: str, typ=None):
     assert len(TokenId) == 5, "Exhaustive list of operands in parse_word()"
     if typ == "str":
         return (TokenId.STR, bytes(token, "utf-8").decode("unicode_escape"))
@@ -313,12 +318,12 @@ def parse_word(token: TokenId, typ=None):
         except ValueError:
             return (TokenId.OP, token)
 
-def find_next(line: int, start: int, predicate: int) -> int:
+def find_next(line: str, start: int, predicate) -> int:
     while start < len(line) and not predicate(line[start]):
         start += 1
     return start
 
-def unnest_program(program: Program) -> Program:
+def unnest_program(program: Program):
     result = []
     for i in range(len(program.operands)):
         if type(program.operands[i]) is list:
