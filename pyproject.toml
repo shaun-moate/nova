@@ -4,10 +4,11 @@ version = "0.1.0"
 description = "stack-based language inspired by forth (and porth, tsoding)"
 authors = ["shaun-moate <shaun.moate@gmail.com>"]
 readme = "README.md"
-packages = [{include = "nova_lang"}]
+packages = [{include = "nova"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+pytest = "^7.4.0"
 
 
 [build-system]
