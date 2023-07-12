@@ -1,3 +1,5 @@
+import subprocess
+
 from nova.dataclasses import Program
 
 def uncons(xs):
@@ -19,4 +21,12 @@ def unnest_program(program: Program):
     program.operands = result
     return program
 
+def call_cmd():
+    print("BUILD:-------------------------------------")
+    print("run: nasm -felf64 build/output.asm")
+    subprocess.call(["nasm", "-felf64", "build/output.asm"])
+    print("run: ld -o build/output build/output.o")
+    subprocess.call(["ld", "-o", "build/output", "build/output.o"])
+    print("run: build/output")
+    print("-------------------------------------------")
 
