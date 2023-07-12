@@ -3,7 +3,7 @@
 import sys
 import subprocess
 
-from nova.helpers import uncons
+from nova.helpers import uncons, find_next, unnest_program
 from nova.builtins import OperandId, MacroId, ConstantId, TokenId
 from nova.dataclasses import FileLocation, Token, Operand, Program
 
@@ -233,22 +233,6 @@ def parse_word(token: str, typ=None):
             return (TokenId.INT, int(token))
         except ValueError:
             return (TokenId.OP, token)
-
-def find_next(line: str, start: int, predicate) -> int:
-    while start < len(line) and not predicate(line[start]):
-        start += 1
-    return start
-
-def unnest_program(program: Program):
-    result = []
-    for i in range(len(program.operands)):
-        if type(program.operands[i]) is list:
-            for j in range(len(program.operands[i])):
-                result.append(program.operands[i][j])
-        else:
-            result.append(program.operands[i])
-    program.operands = result
-    return program
 
 def simulate_program(program):
     stack = []
