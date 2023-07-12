@@ -2,11 +2,10 @@
 
 import sys
 import subprocess
-from dataclasses import dataclass, field
-from typing import List, Union
 
 from nova.helpers import uncons
 from nova.builtins import OperandId, MacroId, ConstantId, TokenId
+from nova.dataclasses import FileLocation, Token, Operand, Program
 
 STR_ALLOCATION_SIZE = 69_000
 MEM_ALLOCATION_SIZE = 69_000
@@ -61,36 +60,6 @@ assert len(ConstantId) == 1, "Exhaustive list of constants"
 BUILTIN_CONST = {
     "CATCH":   22,
 }
-
-@dataclass
-class FileLocation:
-    file_path: str
-    row:       int
-    col:       int
-
-@dataclass
-class Token:
-    typ:       TokenId
-    location:  FileLocation
-    value:     Union[int, str, None]
-
-@dataclass
-class Operand:
-    action:    OperandId
-    jump_to:   int
-    mem_addr:  int
-    location:  FileLocation
-    value:     int | str | None
-    def __getitem__(self, index):
-        return self[index]
-    def __len__(self):
-        return len(self)
-
-@dataclass
-class Program:
-    operands: List[Operand] = field(default_factory=list)
-    def __len__(self):
-        return len(self)
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
