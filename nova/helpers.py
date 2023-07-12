@@ -30,3 +30,13 @@ def call_cmd():
     print("run: build/output")
     print("-------------------------------------------")
 
+def usage(program):
+    print("-------------------------------------------")
+    print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
+    print("SUBCOMMANDS:")
+    print("    --compile  (-c) <file>       Compile the program to Assembly")
+    print("    --help                       Provide usage details")
+    print("    --simulate (-s) <file>       Simulate the program using Python3")
+    print("-------------------------------------------")
+    exit(1)
+

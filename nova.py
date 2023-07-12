@@ -3,7 +3,7 @@
 import sys
 import subprocess
 
-from nova.helpers import uncons, find_next, unnest_program
+from nova.helpers import uncons, find_next, unnest_program, usage
 from nova.builtins import Builtins, OperandId, TokenId
 from nova.dataclasses import FileLocation, Token, Operand, Program
 from nova.simulator import simulate_program
@@ -181,16 +181,6 @@ def parse_word(token: str, typ=None):
             return (TokenId.INT, int(token))
         except ValueError:
             return (TokenId.OP, token)
-
-def usage(program):
-    print("-------------------------------------------")
-    print("Usage: %s <SUBCOMMAND> [ARGS]" % program)
-    print("SUBCOMMANDS:")
-    print("    --compile  (-c) <file>       Compile the program to Assembly")
-    print("    --help                       Provide usage details")
-    print("    --simulate (-s) <file>       Simulate the program using Python3")
-    print("-------------------------------------------")
-    exit(1)
 
 if __name__ == "__main__":
     argv = sys.argv
