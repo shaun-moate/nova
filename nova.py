@@ -3,12 +3,10 @@
 import sys
 import subprocess
 
+from nova.config import Config
 from nova.helpers import uncons, find_next, unnest_program
 from nova.builtins import OperandId, MacroId, ConstantId, TokenId
 from nova.dataclasses import FileLocation, Token, Operand, Program
-
-STR_ALLOCATION_SIZE = 69_000
-MEM_ALLOCATION_SIZE = 69_000
 
 assert len(OperandId) == 33, "Exhaustive list of operands"
 ## TODO: add `include` to support the inclusion of base libraries of operations (ie. include "nova:core")
@@ -236,7 +234,7 @@ def parse_word(token: str, typ=None):
 
 def simulate_program(program):
     stack = []
-    mem = bytearray(MEM_ALLOCATION_SIZE + STR_ALLOCATION_SIZE)
+    mem = bytearray(Config.MEM_ALLOCATION_SIZE + Config.STR_ALLOCATION_SIZE)
     str_addr_start = 0
     ip = 0
     while ip < len(program.operands):
@@ -253,7 +251,7 @@ def simulate_program(program):
                 for i in reversed(range(str_length)):
                     mem[str_addr_start+i] = str_bytes[i]
                 str_addr_start += str_length
-                assert str_addr_start <= STR_ALLOCATION_SIZE, "ERROR: String buffer overflow"
+                assert str_addr_start <= Config.STR_ALLOCATION_SIZE, "ERROR: String buffer overflow"
             stack.append(str_length)
             stack.append(op.mem_addr)
             ip += 1
@@ -377,7 +375,7 @@ def simulate_program(program):
         elif op.action == OperandId.END:
             ip += 1
         elif op.action == OperandId.MEM_ADDR:
-            stack.append(STR_ALLOCATION_SIZE)
+            stack.append(Config.STR_ALLOCATION_SIZE)
             ip += 1
         elif op.action == OperandId.MEM_STORE:
             byte = stack.pop()
@@ -611,7 +609,7 @@ def compile_program(program):
         out.write("    mov rdi, 0\n")
         out.write("    syscall\n")
         out.write("segment .bss\n")
-        out.write("    mem: resb %d\n" % (STR_ALLOCATION_SIZE + MEM_ALLOCATION_SIZE))
+        out.write("    mem: resb %d\n" % (Config.STR_ALLOCATION_SIZE + Config.MEM_ALLOCATION_SIZE))
         out.write("segment .data\n")
         for index, string in enumerate(str_stack):
             out.write("    str_%d: db " % index)
