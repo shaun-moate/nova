@@ -49,3 +49,56 @@ class TokenId(Enum):
     INT       = auto()
     STR       = auto()
 
+class Builtins:
+    assert len(OperandId) == 33, "Exhaustive list of operands"
+    ## TODO: add `include` to support the inclusion of base libraries of operations (ie. include "nova:core")
+    ## TODO: add `{` and `}` as operands to help segment blocks and improve readability
+    ## TODO: add `(` and `)` as operands to help with math ordering`
+    BUILTIN_OPS = {
+        "int":     OperandId.PUSH_INT,
+        "str":     OperandId.PUSH_STR,
+        "+":       OperandId.PLUS,
+        "-":       OperandId.MINUS,
+        "*":       OperandId.MULT,
+        "==":      OperandId.EQUAL,
+        "!=":      OperandId.NOT_EQUAL,
+        ">":       OperandId.GREATER,
+        ">=":      OperandId.GR_EQ,
+        "<":       OperandId.LESSER,
+        "<=":      OperandId.LESS_EQ,
+        "if":      OperandId.IF,
+        "else":    OperandId.ELSE,
+        "fi":      OperandId.FI,
+        "while":   OperandId.WHILE,
+        "do":      OperandId.DO,
+        "done":    OperandId.DONE,
+        "end":     OperandId.END,
+        "mem":     OperandId.MEM_ADDR,
+        "store8":  OperandId.MEM_STORE,
+        "load8":   OperandId.MEM_LOAD,
+        "syscall": OperandId.SYSCALL,
+        "over":    OperandId.OVER,
+        "swap":    OperandId.SWAP,
+        "dup":     OperandId.DUP,
+        "2dup":    OperandId.DUP2,
+        "dump":    OperandId.DUMP,
+        "drop":    OperandId.DROP,
+        "shl":     OperandId.SHL,
+        "shr":     OperandId.SHR,
+        "band":    OperandId.BAND,
+        "bor":     OperandId.BOR,
+        "exit":    OperandId.EXIT
+    }
+
+    assert len(ConstantId) == 1, "Exhaustive list of constants"
+    BUILTIN_CONST = {
+        "CATCH":   22,
+    }
+
+    ## TODO: add MACROS to examples to improve readability -> ie. rule110.nv
+    assert len(MacroId) == 1, "Exhaustive list of macros"
+    BUILTIN_MACRO = {
+        "write":   [1, 1, 'syscall'],
+    }
+
+

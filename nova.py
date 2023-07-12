@@ -5,59 +5,8 @@ import subprocess
 
 from nova.config import Config
 from nova.helpers import uncons, find_next, unnest_program
-from nova.builtins import OperandId, MacroId, ConstantId, TokenId
+from nova.builtins import Builtins, OperandId, TokenId
 from nova.dataclasses import FileLocation, Token, Operand, Program
-
-assert len(OperandId) == 33, "Exhaustive list of operands"
-## TODO: add `include` to support the inclusion of base libraries of operations (ie. include "nova:core")
-## TODO: add `{` and `}` as operands to help segment blocks and improve readability
-## TODO: add `(` and `)` as operands to help with math ordering`
-BUILTIN_OPS = {
-    "int":     OperandId.PUSH_INT,
-    "str":     OperandId.PUSH_STR,
-    "+":       OperandId.PLUS,
-    "-":       OperandId.MINUS,
-    "*":       OperandId.MULT,
-    "==":      OperandId.EQUAL,
-    "!=":      OperandId.NOT_EQUAL,
-    ">":       OperandId.GREATER,
-    ">=":      OperandId.GR_EQ,
-    "<":       OperandId.LESSER,
-    "<=":      OperandId.LESS_EQ,
-    "if":      OperandId.IF,
-    "else":    OperandId.ELSE,
-    "fi":      OperandId.FI,
-    "while":   OperandId.WHILE,
-    "do":      OperandId.DO,
-    "done":    OperandId.DONE,
-    "end":     OperandId.END,
-    "mem":     OperandId.MEM_ADDR,
-    "store8":  OperandId.MEM_STORE,
-    "load8":   OperandId.MEM_LOAD,
-    "syscall": OperandId.SYSCALL,
-    "over":    OperandId.OVER,
-    "swap":    OperandId.SWAP,
-    "dup":     OperandId.DUP,
-    "2dup":    OperandId.DUP2,
-    "dump":    OperandId.DUMP,
-    "drop":    OperandId.DROP,
-    "shl":     OperandId.SHL,
-    "shr":     OperandId.SHR,
-    "band":    OperandId.BAND,
-    "bor":     OperandId.BOR,
-    "exit":    OperandId.EXIT
-}
-
-## TODO: add MACROS to examples to improve readability -> ie. rule110.nv
-assert len(MacroId) == 1, "Exhaustive list of macros"
-BUILTIN_MACRO = {
-    "write":   [1, 1, 'syscall'],
-}
-
-assert len(ConstantId) == 1, "Exhaustive list of constants"
-BUILTIN_CONST = {
-    "CATCH":   22,
-}
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
@@ -104,8 +53,8 @@ def parse_token_as_op(token: Token):
     location = token.location
     assert len(TokenId) == 5, "Exhaustive list of operands in parse_word()"
     if token.typ == TokenId.OP:
-        if token.value in BUILTIN_OPS:
-            return Operand(action   = BUILTIN_OPS[token.value],
+        if token.value in Builtins.BUILTIN_OPS:
+            return Operand(action   = Builtins.BUILTIN_OPS[token.value],
                            jump_to  = -1,
                            mem_addr = -1,
                            location = location,
@@ -121,12 +70,12 @@ def parse_token_as_op(token: Token):
                         value    = value)
                 for (action, value) in parse_macro(token.value)]
     elif token.typ == TokenId.CONST:
-        if token.value in BUILTIN_CONST:
+        if token.value in Builtins.BUILTIN_CONST:
             return Operand(action   = OperandId.PUSH_INT,
                            jump_to  = -1,
                            mem_addr = -1,
                            location = token.location,
-                           value    = BUILTIN_CONST[token.value])
+                           value    = Builtins.BUILTIN_CONST[token.value])
     elif token.typ == TokenId.INT:
         return Operand(action   = OperandId.PUSH_INT,
                        jump_to  = -1,
@@ -151,14 +100,14 @@ def parse_tokens_from_file(input_file_path: str):
                 for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
 
 def parse_macro(macro):
-    instructions = BUILTIN_MACRO[macro]
-    if macro in BUILTIN_MACRO:
+    instructions = Builtins.BUILTIN_MACRO[macro]
+    if macro in Builtins.BUILTIN_MACRO:
         for i in instructions:
             if parse_word(i)[0] == TokenId.OP:
-                if i in BUILTIN_OPS:
-                    yield(BUILTIN_OPS[i], i)
+                if i in Builtins.BUILTIN_OPS:
+                    yield(Builtins.BUILTIN_OPS[i], i)
                 else:
-                    assert False, "ERROR: `%s` not found in BUILTIN_OPS" % i
+                    assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % i
             elif parse_word(i)[0] == TokenId.INT:
                 yield(OperandId.PUSH_INT, int(i))
 
@@ -170,23 +119,23 @@ def parse_line(line: str):
             yield(start, parse_word(line[start+1:end], typ="str"))
         elif line[start:find_next(line, start, lambda x : x.isspace())] == "macro":
             (name, start, end) = parse_name(line, start)
-            if name in BUILTIN_MACRO:
+            if name in Builtins.BUILTIN_MACRO:
                 print("ERROR: attempting to override a built-in macro `%s` - not permitted" % name)
                 exit(1)
             (macro_stack, start, end) = parse_macro_stack(line, start, end)
-            BUILTIN_MACRO[name] = macro_stack
+            Builtins.BUILTIN_MACRO[name] = macro_stack
             start = find_next(line, end+1, lambda x: not x.isspace())
-        elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_MACRO:
+        elif line[start:find_next(line, start, lambda x: x.isspace())] in Builtins.BUILTIN_MACRO:
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end], typ="macro"))
         elif line[start:find_next(line, start, lambda x: x.isspace())] == "const":
             (name, start, end) = parse_name(line, start)
-            if name in BUILTIN_CONST:
+            if name in Builtins.BUILTIN_CONST:
                 print("ERROR: attempting to override a built-in constant `%s` - not permitted" % name)
                 exit(1)
             (value, start, end) = parse_const_int(line, start, end)
-            BUILTIN_CONST[name] = int(value)
-        elif line[start:find_next(line, start, lambda x: x.isspace())] in BUILTIN_CONST:
+            Builtins.BUILTIN_CONST[name] = int(value)
+        elif line[start:find_next(line, start, lambda x: x.isspace())] in Builtins.BUILTIN_CONST:
             end = find_next(line, start, lambda x: x.isspace())
             yield(start, parse_word(line[start:end], typ="const"))
         else:
