@@ -33,7 +33,7 @@ def generate_all_test_cases(input_directory: str):
 def generate_test_case(input_file_path: str):
     output_file_path = str(input_file_path[:-len(NOVA_EXT)])
     print("[INFO] building %s: build/output" % (input_file_path))
-    build = subprocess.run(["./nova.py", "-c", input_file_path], stdout=subprocess.DEVNULL)
+    build = subprocess.run(["python", "-m", "nova", "-c", input_file_path], stdout=subprocess.DEVNULL)
     print("[INFO] generating test case file: %s -> %s" % (input_file_path, output_file_path))
     result = subprocess.run(["build/output"], capture_output=True, text=True)
     with open(output_file_path, "w") as file:
@@ -74,12 +74,12 @@ def run_test_case(input_file_path: str):
       SIMULATE_FAILURE_LIST.append(input_file_path)
 
 def compile_test_case(input_file_path: str):
-    build = subprocess.run(["./nova.py", "-c", input_file_path], stdout=subprocess.DEVNULL)
+    build = subprocess.run(["python", "-m", "nova", "-c", input_file_path], stdout=subprocess.DEVNULL)
     result = subprocess.run(["build/output"], capture_output=True, text=True)
     return str(result.returncode) + result.stdout
 
 def simulate_test_case(input_file_path: str):
-    result = subprocess.run(["./nova.py", "-s" , input_file_path], capture_output=True, text=True)
+    result = subprocess.run(["python", "-m", "nova", "-s" , input_file_path], capture_output=True, text=True)
     return str(result.returncode) + result.stdout
 
 def load_test_case(input_file_path: str):

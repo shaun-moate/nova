@@ -6,9 +6,9 @@ IT IS heavily inspired by Porth (tsoding)!
 ## Getting Started
 You can either simulate the code OR compile to an executable (output).  The executable is written in Assembly.  The simulation is done using python3.
 ``` sh
-./nova.py --help
-./nova.py --simulate (-s)      <file>
-./nova.py --compile  (-c) (-r) <file>
+python -m nova --help
+python -m nova --simulate (-s)      <file>
+python -m nova --compile  (-c) (-r) <file>
      note: adding optional -r to compile script will run build/output immediately
 ```
 

@@ -8,7 +8,6 @@ from nova.lexer import parse_program_from_file
 from nova.simulator import simulate_program
 from nova.compiler import compile_program
 
-
 if __name__ == "__main__":
     argv = sys.argv
     assert len(argv) >= 1
@@ -45,3 +44,4 @@ if __name__ == "__main__":
     else:
         print("ERROR: unknown nova subcommand `%s`" % (subcommand))
         usage(program)
+
