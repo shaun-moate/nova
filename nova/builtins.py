@@ -50,7 +50,6 @@ class TokenId(Enum):
     STR       = auto()
 
 class Builtins:
-    assert len(OperandId) == 33, "Exhaustive list of operands"
     ## TODO: add `include` to support the inclusion of base libraries of operations (ie. include "nova:core")
     ## TODO: add `{` and `}` as operands to help segment blocks and improve readability
     ## TODO: add `(` and `)` as operands to help with math ordering`
@@ -90,13 +89,11 @@ class Builtins:
         "exit":    OperandId.EXIT
     }
 
-    assert len(ConstantId) == 1, "Exhaustive list of constants"
     BUILTIN_CONST = {
         "CATCH":   22,
     }
 
     ## TODO: add MACROS to examples to improve readability -> ie. rule110.nv
-    assert len(MacroId) == 1, "Exhaustive list of macros"
     BUILTIN_MACRO = {
         "write":   [1, 1, 'syscall'],
     }

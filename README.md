@@ -19,7 +19,7 @@ Some quick and easy examples to demonstrate the language of Nova. It's not perfe
     ``` forth
     10 10 == if
         69 dump
-    else 
+		else 
         96 dump
     end
     ```
