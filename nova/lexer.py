@@ -1,4 +1,4 @@
-from nova.helpers import find_next, unnest_program
+from nova.helpers import find_next
 from nova.builtins import Builtins, OperandId, TokenId
 from nova.dataclasses import FileLocation, Token, Operand, Program
 
@@ -8,6 +8,18 @@ def parse_program_from_file(input_file_path: str) -> Program:
                     Program(operands = [parse_token_as_op(token) 
                                         for token in parse_tokens_from_file(input_file_path)])
                 )
+
+def unnest_program(program: Program):
+    result = []
+    for i in range(len(program.operands)):
+        if type(program.operands[i]) is list:
+            for j in range(len(program.operands[i])):
+                result.append(program.operands[i][j])
+        else:
+            result.append(program.operands[i])
+    program.operands = result
+    return program
+
 
 def generate_blocks(program: Program) -> Program:
     block = []
