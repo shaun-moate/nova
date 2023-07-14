@@ -12,20 +12,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: install python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: install poetry & tox
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           python -m pip install --upgrade pip
           pip install tox tox-gh-actions
-      - name: Install NASM
+      - name: install nasm
         uses: ilammy/setup-nasm@v1
-      - name: Display NASM version
-        run: nasm --version
-      - name: Testing with Tox
+      - name: test -> tox
         run: tox
-      - name: Run Use-Case Testing Framework
+      - name: test -> ./test-nova.py
         run: ./test-nova.py --run tests
