@@ -6,6 +6,7 @@ authors = ["shaun-moate <shaun.moate@gmail.com>"]
 readme = "README.md"
 packages = [{include = "nova"}]
 
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pytest = "^7.4.0"
