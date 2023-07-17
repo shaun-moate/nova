@@ -5,38 +5,43 @@ from nova.helpers import *
 from nova.dataclasses import *
 
 
-# get_next_token
-def test_get_next_token_as_expected():
+# get_next_symbol
+def test_get_next_symbol_as_expected():
     line = '69 96 + dump'
-    token = get_next_token(line, start=0) 
-    assert token == (0, 2, '69', None)
+    symbol = get_next_symbol(line, start=0) 
+    assert symbol == Symbol(start = 0, end = 2, value = '69', string = False)
 
-def test_get_next_token_string_case():
+def test_get_next_symbol_string_case():
     line = '     "this is a string, hello world!"'
-    get_next_token(line, start=0) 
-    token = get_next_token(line, start=0) 
-    assert token == (5, 37, 'this is a string, hello world!', 'str')
+    symbol = get_next_symbol(line, start=0) 
+    assert symbol == Symbol(start = 5, end = 37, value = 'this is a string, hello world!', string = True)
 
-def test_get_next_token_as_list():
-    token_list = []
+def test_get_next_symbol_as_list():
+    symbol_list = []
     start = 0
     line = '69 96 + dump'
     while start < len(line):
-        token = get_next_token(line, start)
-        token_list.append(token)
-        start = token[1]
-    assert token_list == [(0, 2, '69', None), (3, 5, '96', None), (6, 7, '+', None), (8, 12, 'dump', None)]
+        symbol = get_next_symbol(line, start)
+        symbol_list.append(symbol)
+        start = symbol.end
+    assert symbol_list == [Symbol(start = 0, end = 2, value = '69', string = False), 
+                          Symbol(start = 3, end = 5, value = '96', string = False), 
+                          Symbol(start = 6, end = 7, value = '+', string = False), 
+                          Symbol(start = 8, end = 12, value = 'dump', string = False)]
 
-def test_get_next_token_as_list_with_string():
-    token_list = []
+def test_get_next_symbol_as_list_with_string():
+    symbol_list = []
     start = 0
     line = '69 96 + "hello, world!" dump'
     while start < len(line):
-        token = get_next_token(line, start)
-        token_list.append(token)
-        start = token[1]
-    print(token_list)
-    assert token_list == [(0, 2, '69', None), (3, 5, '96', None), (6, 7, '+', None), (8, 23, 'hello, world!', 'str'), (24, 28, 'dump', None)]
+        symbol = get_next_symbol(line, start)
+        symbol_list.append(symbol)
+        start = symbol.end
+    assert symbol_list == [Symbol(start = 0, end = 2, value = '69', string = False), 
+                          Symbol(start = 3, end = 5, value = '96', string = False), 
+                          Symbol(start = 6, end = 7, value = '+', string = False), 
+                          Symbol(start = 8, end = 23, value = 'hello, world!', string = True),
+                          Symbol(start = 24, end = 28, value = 'dump', string = False)]
 
 
 # assign_token_type

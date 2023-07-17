@@ -4,6 +4,13 @@ from typing import List, Union
 from nova.builtins import TokenId, OperandId
 
 @dataclass
+class Symbol:
+    start:     int
+    end:       int
+    value:     str
+    string:    bool
+
+@dataclass
 class FileLocation:
     file_path: str
     row:       int

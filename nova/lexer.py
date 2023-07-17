@@ -1,16 +1,25 @@
 from nova.helpers import find_next, get_macro_or_const_name
 from nova.builtins import Builtins, OperandId, TokenId
-from nova.dataclasses import FileLocation, Token, Operand, Program
+from nova.dataclasses import Symbol, FileLocation, Token, Operand, Program
 
 
-def get_next_token(line: str, start: int):
+def get_next_symbol(line: str, start: int):
     token_start = find_next(line, start, lambda x : not x.isspace()) 
     if line[token_start] == "\"":
         token_end = find_next(line, token_start+1, lambda x : x == "\"")
-        return (token_start, token_end+1, line[token_start+1:token_end], "str")
+        return Symbol(
+                start = token_start, 
+                end = token_end+1, 
+                value = line[token_start+1:token_end], 
+                string = True
+                )
     else:
         token_end = find_next(line, token_start, lambda x : x.isspace())
-        return (token_start, token_end, line[token_start:token_end], None)
+        return Symbol(
+                start = token_start, 
+                end = token_end, 
+                value = line[token_start:token_end], 
+                string = False)
 
 
 def assign_token_type(token: str, typ: str):
@@ -30,36 +39,36 @@ def parse_line(line: str):
     start = 0
     end = 0
     while start < len(line)-1:
-        token = get_next_token(line, start)
-        if token[3] == "str":
-            end = token[1]
-            yield(start, assign_token_type(token[2], typ="str"))
-        elif token[2] == "macro":
+        symbol = get_next_symbol(line, start)
+        if symbol.string:
+            end = symbol.end
+            yield(start, assign_token_type(symbol.value, typ="str"))
+        elif symbol.value == "macro":
             (name, start, end) = get_macro_or_const_name(line, start)
             if name in Builtins.BUILTIN_MACRO:
                 print("ERROR: attempting to override a built-in macro `%s` - not permitted" % name)
                 exit(1)
             (macro_stack, start, end) = parse_macro_stack(line, start, end)
             Builtins.BUILTIN_MACRO[name] = macro_stack
-        elif token[2] in Builtins.BUILTIN_MACRO:
-            end = token[1]
-            yield(start, assign_token_type(token[2], typ="macro"))
-        elif token[2] == "const":
+        elif symbol.value in Builtins.BUILTIN_MACRO:
+            end = symbol.end
+            yield(start, assign_token_type(symbol.value, typ="macro"))
+        elif symbol.value == "const":
             (name, start, end) = get_macro_or_const_name(line, start)
             if name in Builtins.BUILTIN_CONST:
                 print("ERROR: attempting to override a built-in constant `%s` - not permitted" % name)
                 exit(1)
             (value, start, end) = parse_const_int(line, start, end)
             Builtins.BUILTIN_CONST[name] = int(value)
-        elif token[2] in Builtins.BUILTIN_CONST:
-            end = token[1]
+        elif symbol.value in Builtins.BUILTIN_CONST:
+            end = symbol.end
             yield(start, assign_token_type(line[start:end], typ="const"))
-        elif token[2] in Builtins.BUILTIN_OPS:
-            end = token[1]
-            yield(start, assign_token_type(token[2], typ="op"))
+        elif symbol.value in Builtins.BUILTIN_OPS:
+            end = symbol.end
+            yield(start, assign_token_type(symbol.value, typ="op"))
         else:
-            end = token[1]
-            yield(start, assign_token_type(token[2], "int"))
+            end = symbol.end
+            yield(start, assign_token_type(symbol.value, "int"))
         start = end+1
 
 
