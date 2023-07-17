@@ -8,6 +8,15 @@ def find_next(line: str, start: int, predicate) -> int:
         start += 1
     return start
 
+def get_macro_or_const_name(line: str, start: int):
+    skip_end = find_next(line, start, lambda x: x.isspace())
+    if line[start:skip_end] == "macro" or line[start:skip_end] == "const":
+        start_next = find_next(line, skip_end+1, lambda x: not x.isspace())
+        end_next = find_next(line, start_next, lambda x: x.isspace())
+        return (line[start_next:end_next], start_next, end_next)
+    else:
+        assert False, "ERROR: get_macro_or_const_name must be called on a 'macro' or a 'const'"
+
 def call_cmd():
     print("BUILD:-------------------------------------")
     print("run: nasm -felf64 build/output.asm")

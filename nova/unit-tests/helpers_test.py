@@ -1,3 +1,5 @@
+import pytest
+
 from nova.helpers import *
 
 ## uncons
@@ -43,7 +45,22 @@ def test_check_find_get_first_token():
     token = line[start:end]
     assert token == '34'
 
-## unnest_program
+# get_macro_or_const_name
+def test_check_get_macro_name():
+    line = 'macro sixty-nine 69 dump'
+    token = get_macro_or_const_name(line, start=0)
+    assert token == ('sixty-nine', 6, 16)
+
+def test_check_get_const_name():
+    line = 'const sixty-nine 69'
+    token = get_macro_or_const_name(line, start=0)
+    assert token == ('sixty-nine', 6, 16)
+
+def test_check_get_macro_or_const_name_error():
+    line = 'error sixty-nine 69 dump'
+    with pytest.raises(AssertionError):
+        get_macro_or_const_name(line, start=0)
+
 
 
 '''
