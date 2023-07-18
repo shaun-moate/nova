@@ -62,7 +62,7 @@ def test_check_assign_token_type_int():
     assert token_int == (TokenId.INT, 42)
 
 def test_check_assign_token_type_int_string_passed_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(AssertionError):
         assign_token_type(token="forty-two", typ="int")
 
 def test_check_assign_token_type_operand():
@@ -70,11 +70,94 @@ def test_check_assign_token_type_operand():
     assert token_op == (TokenId.OP, "forty-two")
 
 
+# lex_line_to_tokens():
+def test_lex_line_to_tokens_as_expected():
+    line = '69 96 + dump'
+    tokens = list(lex_line_to_tokens(line))
+    assert tokens == [
+            (0, (TokenId.INT, 69)),
+            (3, (TokenId.INT, 96)),
+            (6, (TokenId.OP, "+")),
+            (8, (TokenId.OP, "dump"))
+            ]
+
+def test_lex_line_to_tokens_with_unknown_op_error():
+    line = '69 96 + unknown'
+    with pytest.raises(AssertionError):
+        list(lex_line_to_tokens(line))
+
+def test_lex_line_to_tokens_with_string():
+    line = '"Hello, World!" write'
+    tokens = list(lex_line_to_tokens(line))
+    assert tokens == [
+            (0, (TokenId.STR, "Hello, World!")),
+            (16, (TokenId.MACRO, "write"))
+            ]
+
+def test_lex_line_to_tokens_with_new_macro():
+    line = 'macro write69 69 dump end'
+    tokens = list(lex_line_to_tokens(line))
+    assert tokens == []
+
+def test_lex_line_to_tokens_with_set_macro():
+    line = 'macro write96 96 dump end write96'
+    tokens = list(lex_line_to_tokens(line))
+    assert tokens == [
+            (26, (TokenId.MACRO, "write96"))
+            ]
+
+def test_lex_line_to_tokens_with_existing_macro_error():
+    line = 'macro write 42 dump end'
+    with pytest.raises(AssertionError):
+        list(lex_line_to_tokens(line))
+
+def test_lex_line_to_tokens_with_set_force_recursive_error():
+    line = 'macro write42 42 dump write42 end'
+    with pytest.raises(AssertionError):
+        list(lex_line_to_tokens(line))
+
+def test_lex_line_to_tokens_with_set_force_without_end_error():
+    line = 'macro write412 412 dump'
+    with pytest.raises(AssertionError):
+        list(lex_line_to_tokens(line))
+
+def test_lex_line_to_tokens_with_new_const():
+    line = 'const SIXTY9 69'
+    tokens = list(lex_line_to_tokens(line))
+    assert tokens == []
+
+def test_lex_line_to_tokens_with_set_const():
+    line = 'const NINETY6 96 NINETY6'
+    tokens = list(lex_line_to_tokens(line))
+    assert tokens == [
+            (17, (TokenId.CONST, "NINETY6"))
+            ]
+
+def test_lex_line_to_tokens_with_existing_const_error():
+    line = 'const CATCH 69'
+    with pytest.raises(AssertionError):
+        list(lex_line_to_tokens(line))
+
+def test_lex_line_to_tokens_with_set_const_force_must_be_integer_error():
+    line = 'const FORTY2 FORTY2'
+    with pytest.raises(AssertionError):
+        list(lex_line_to_tokens(line))
+
+# lex_const_to_builtins():
+
+
 
 '''
 from nova.helpers import find_next
 from nova.builtins import Builtins, OperandId, TokenId
 from nova.dataclasses import FileLocation, Token, Operand, Program
+
+def parse_const_int(line, start, end):
+    start = find_next(line, end+1, lambda x: not x.isspace())
+    end = find_next(line, start, lambda x: x.isspace())
+    value = line[start:end]
+    assert int(value), "ERROR: const value must be of type integer"
+    return (value, start, end)
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
@@ -191,38 +274,6 @@ def parse_macro(macro):
             elif parse_word(i)[0] == TokenId.INT:
                 yield(OperandId.PUSH_INT, int(i))
 
-def parse_line(line: str):
-    start = find_next(line, 0, lambda x : not x.isspace())
-    while start < len(line):
-        if line[start] == "\"":
-            end = find_next(line, start+1, lambda x : x == "\"")
-            yield(start, parse_word(line[start+1:end], typ="str"))
-        elif line[start:find_next(line, start, lambda x : x.isspace())] == "macro":
-            (name, start, end) = parse_name(line, start)
-            if name in Builtins.BUILTIN_MACRO:
-                print("ERROR: attempting to override a built-in macro `%s` - not permitted" % name)
-                exit(1)
-            (macro_stack, start, end) = parse_macro_stack(line, start, end)
-            Builtins.BUILTIN_MACRO[name] = macro_stack
-            start = find_next(line, end+1, lambda x: not x.isspace())
-        elif line[start:find_next(line, start, lambda x: x.isspace())] in Builtins.BUILTIN_MACRO:
-            end = find_next(line, start, lambda x: x.isspace())
-            yield(start, parse_word(line[start:end], typ="macro"))
-        elif line[start:find_next(line, start, lambda x: x.isspace())] == "const":
-            (name, start, end) = parse_name(line, start)
-            if name in Builtins.BUILTIN_CONST:
-                print("ERROR: attempting to override a built-in constant `%s` - not permitted" % name)
-                exit(1)
-            (value, start, end) = parse_const_int(line, start, end)
-            Builtins.BUILTIN_CONST[name] = int(value)
-        elif line[start:find_next(line, start, lambda x: x.isspace())] in Builtins.BUILTIN_CONST:
-            end = find_next(line, start, lambda x: x.isspace())
-            yield(start, parse_word(line[start:end], typ="const"))
-       else:
-            end = find_next(line, start, lambda x: x.isspace())
-            yield(start, parse_word(line[start:end]))
-        start = find_next(line, end+1, lambda x: not x.isspace())
-
 def parse_macro_stack(line, start, end):
     macro_stack = []
     start = find_next(line, end+1, lambda x: not x.isspace())
@@ -234,12 +285,6 @@ def parse_macro_stack(line, start, end):
     end = find_next(line, start, lambda x: x.isspace())
     return (macro_stack, start, end)
 
-def parse_const_int(line, start, end):
-    start = find_next(line, end+1, lambda x: not x.isspace())
-    end = find_next(line, start, lambda x: x.isspace())
-    value = line[start:end]
-    assert int(value), "ERROR: const value must be of type integer"
-    return (value, start, end)
 
 
 '''
