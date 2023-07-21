@@ -76,7 +76,7 @@ def lex_line_to_tokens(line: str):
 def store_const(line, name, start):
     integer = get_next_symbol(line, start)
     try:
-        Builtins.BUILTIN_CONST[name] = int(integer.value)
+        Builtins.BUILTIN_CONST[name] = assign_token_type(integer.value, "int")
         return integer.end
     except ValueError:
         assert False, "ERROR: const value must be of type integer"

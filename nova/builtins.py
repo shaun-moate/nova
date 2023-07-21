@@ -90,7 +90,7 @@ class Builtins:
     }
 
     BUILTIN_CONST = {
-        "CATCH":   22,
+        "CATCH":   (TokenId.INT, 22),
     }
 
     ## TODO: add MACROS to examples to improve readability -> ie. rule110.nv

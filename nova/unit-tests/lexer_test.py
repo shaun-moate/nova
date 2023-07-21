@@ -146,12 +146,11 @@ def test_lex_line_to_tokens_with_set_const_force_must_be_integer_error():
 
 
 # store_const():
-# TODO get store_const to store token instead of raw value
 def test_store_const_as_expected():
     line = 'const TEMP 69'
     name = get_next_symbol(line, 5)
     store_const(line, name.value, name.end)
-    assert Builtins.BUILTIN_CONST[name.value] == 69
+    assert Builtins.BUILTIN_CONST[name.value] == (TokenId.INT, 69)
 
 def test_store_const_force_error_with_string():
     line = 'const ERROR not_valid'
