@@ -95,7 +95,7 @@ class Builtins:
 
     ## TODO: add MACROS to examples to improve readability -> ie. rule110.nv
     BUILTIN_MACRO = {
-        "write":   [1, 1, 'syscall'],
+        "write":   [(TokenId.INT, 1), (TokenId.INT, 1), (TokenId.OP, 'syscall')],
     }
 
 

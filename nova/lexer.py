@@ -87,7 +87,12 @@ def store_macro(line, name, start):
         symbol = get_next_symbol(line, start)
         while symbol.value != "end":
             if symbol.value != name:
-                macro_stack.append(symbol.value)
+                if symbol.string:
+                    macro_stack.append(assign_token_type(symbol.value, "str"))
+                elif symbol.value in Builtins.BUILTIN_OPS:
+                    macro_stack.append(assign_token_type(symbol.value, "op"))
+                else:
+                    macro_stack.append(assign_token_type(symbol.value, "int"))
                 symbol = get_next_symbol(line, symbol.end)
             else:
                 assert False, "ERROR: {} not a valid symbol to add to a MACRO, no recursive macros".format(symbol.value)
@@ -175,7 +180,7 @@ def parse_token_as_op(token: Token):
                            jump_to  = -1,
                            mem_addr = -1,
                            location = token.location,
-                           value    = Builtins.BUILTIN_CONST[token.value])
+                           value    = Builtins.BUILTIN_CONST[token.value][1])
     elif token.typ == TokenId.INT:
         return Operand(action   = OperandId.PUSH_INT,
                        jump_to  = -1,
@@ -201,13 +206,13 @@ def parse_tokens_from_file(input_file_path: str):
         return program
 
 def parse_macro(macro):
-    instructions = Builtins.BUILTIN_MACRO[macro]
     if macro in Builtins.BUILTIN_MACRO:
-        for i in instructions:
-            if i in Builtins.BUILTIN_OPS:
-                yield(Builtins.BUILTIN_OPS[i], i)
-            elif isinstance(int(i), int):
-                yield(OperandId.PUSH_INT, int(i))
+        instructions = Builtins.BUILTIN_MACRO[macro]
+        for token in instructions:
+            if token[1] in Builtins.BUILTIN_OPS:
+                yield(Builtins.BUILTIN_OPS[token[1]], token[1])
+            elif isinstance(int(token[1]), int):
+                yield(OperandId.PUSH_INT, int(token[1]))
             else:
-                assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % i
+                assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % token[1]
 

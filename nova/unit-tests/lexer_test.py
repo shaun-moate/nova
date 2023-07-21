@@ -160,12 +160,11 @@ def test_store_const_force_error_with_string():
 
 
 # store_macro():
-# TODO get store_macro to store tokens instead of raw values
 def test_store_macro_as_expected():
     line = 'macro WHATEVER 69 dump end'
     name = get_next_symbol(line, 5)
     store_macro(line, name.value, name.end)
-    assert Builtins.BUILTIN_MACRO[name.value] == ["69", "dump"]
+    assert Builtins.BUILTIN_MACRO[name.value] == [(TokenId.INT, 69), (TokenId.OP, "dump")]
 
 def test_store_macro_force_error_with_recursive():
     line = 'macro WHATEVER 69 dump WHATEVER end'

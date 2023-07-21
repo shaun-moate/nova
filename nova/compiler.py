@@ -46,7 +46,7 @@ def compile_program(program):
             op = program.operands[ip]
             out.write("addr_%d:\n" % ip)
             if op.action == OperandId.PUSH_INT:
-                out.write("    push %d\n" % int(op.value))
+                out.write("    push %d\n" % op.value)
             elif op.action == OperandId.PUSH_STR:
                 str_bytes = bytes(op.value, "utf-8")
                 out.write("    mov rax, %d\n" % len(bytes(op.value, "utf-8")))
