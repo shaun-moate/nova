@@ -1,6 +1,7 @@
 import pytest
 
 from nova.lexer import *
+from nova.builtins import *
 from nova.helpers import *
 from nova.dataclasses import *
 
@@ -143,21 +144,21 @@ def test_lex_line_to_tokens_with_set_const_force_must_be_integer_error():
     with pytest.raises(AssertionError):
         list(lex_line_to_tokens(line))
 
-# lex_const_to_builtins():
 
+# store_const():
+def test_store_const_as_expected():
+    line = 'const TEMP 69'
+    name = get_next_symbol(line, 5)
+    store_const(line, name.value, name.end)
+    assert Builtins.BUILTIN_CONST["TEMP"] == 69
 
+def test_store_const_force_error_with_string():
+    line = 'const ERROR not_valid'
+    name = get_next_symbol(line, 5)
+    with pytest.raises(AssertionError):
+        store_const(line, name.value, name.end)
 
 '''
-from nova.helpers import find_next
-from nova.builtins import Builtins, OperandId, TokenId
-from nova.dataclasses import FileLocation, Token, Operand, Program
-
-def parse_const_int(line, start, end):
-    start = find_next(line, end+1, lambda x: not x.isspace())
-    end = find_next(line, start, lambda x: x.isspace())
-    value = line[start:end]
-    assert int(value), "ERROR: const value must be of type integer"
-    return (value, start, end)
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):

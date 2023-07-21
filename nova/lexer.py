@@ -60,11 +60,10 @@ def lex_line_to_tokens(line: str):
             end = symbol.end
             yield(start, assign_token_type(symbol.value, typ="macro"))
         elif symbol.value == "const":
-            (name, start, end) = get_macro_or_const_name(line, start)
-            if name in Builtins.BUILTIN_CONST:
-                assert False, "ERROR: attempting to override a built-in constant {} - not permitted".format(name)
-            (value, start, end) = parse_const_int(line, start, end)
-            Builtins.BUILTIN_CONST[name] = int(value)
+            name = get_next_symbol(line, symbol.end)
+            if name.value in Builtins.BUILTIN_CONST:
+                assert False, "ERROR: attempting to override a built-in constant {} - not permitted".format(name.value)
+            end = store_const(line, name.value, name.end)
         elif symbol.value in Builtins.BUILTIN_CONST:
             end = symbol.end
             yield(start, assign_token_type(line[start:end], typ="const"))
@@ -75,6 +74,14 @@ def lex_line_to_tokens(line: str):
             end = symbol.end
             yield(start, assign_token_type(symbol.value, "int"))
         start = end+1
+
+def store_const(line, name, start):
+    integer = get_next_symbol(line, start)
+    try:
+        Builtins.BUILTIN_CONST[name] = int(integer.value)
+        return integer.end
+    except ValueError:
+        assert False, "ERROR: const value must be of type integer"
 
 def parse_macro_stack(name, line, start, end):
     macro_stack = []
@@ -206,13 +213,4 @@ def parse_macro(macro):
                 yield(OperandId.PUSH_INT, int(i))
             else:
                 assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % i
-
-def parse_const_int(line, start, end):
-    start = find_next(line, end+1, lambda x: not x.isspace())
-    end = find_next(line, start, lambda x: x.isspace())
-    value = line[start:end]
-    try:
-        return (int(value), start, end)
-    except ValueError:
-        assert False, "ERROR: const value must be of type integer"
 
