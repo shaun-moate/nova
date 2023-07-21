@@ -50,12 +50,10 @@ def lex_line_to_tokens(line: str):
             end = symbol.end
             yield(start, assign_token_type(symbol.value, typ="str"))
         elif symbol.value == "macro":
-            (name, start, end) = get_macro_or_const_name(line, start)
-            if name in Builtins.BUILTIN_MACRO:
-                assert False, "ERROR: attempting to override a built-in macro {} - not permitted".format(name)
-            (macro_stack, start, end) = parse_macro_stack(name, line, start, end)
-            Builtins.BUILTIN_MACRO[name] = macro_stack
-            end = end
+            name = get_next_symbol(line, symbol.end)
+            if name.value in Builtins.BUILTIN_MACRO:
+                assert False, "ERROR: attempting to override a built-in macro {} - not permitted".format(name.value)
+            end = store_macro(line, name.value, name.end)
         elif symbol.value in Builtins.BUILTIN_MACRO:
             end = symbol.end
             yield(start, assign_token_type(symbol.value, typ="macro"))
@@ -83,19 +81,18 @@ def store_const(line, name, start):
     except ValueError:
         assert False, "ERROR: const value must be of type integer"
 
-def parse_macro_stack(name, line, start, end):
+def store_macro(line, name, start):
     macro_stack = []
-    start = find_next(line, end+1, lambda x: not x.isspace())
     if "end" in line:
-        while line[start:find_next(line, start, lambda x: x.isspace())] != "end":
-            end = find_next(line, start, lambda x: x.isspace());
-            if line[start:end] != name:
-                macro_stack.append(line[start:end])
-                start = find_next(line, end+1, lambda x: not x.isspace())
+        symbol = get_next_symbol(line, start)
+        while symbol.value != "end":
+            if symbol.value != name:
+                macro_stack.append(symbol.value)
+                symbol = get_next_symbol(line, symbol.end)
             else:
-                assert False, "ERROR: {} not a valid symbol to add to a MACRO, no recursive macros".format(line[start:end])
-        end = find_next(line, start, lambda x: x.isspace())
-        return (macro_stack, start, end)
+                assert False, "ERROR: {} not a valid symbol to add to a MACRO, no recursive macros".format(symbol.value)
+        Builtins.BUILTIN_MACRO[name] = macro_stack
+        return symbol.end
     else:
         assert False, "ERROR: when establishing a macro you must supply an `end` symbol - no `end` found on line"
 

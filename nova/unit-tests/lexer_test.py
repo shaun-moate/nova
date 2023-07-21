@@ -146,17 +146,34 @@ def test_lex_line_to_tokens_with_set_const_force_must_be_integer_error():
 
 
 # store_const():
+# TODO get store_const to store token instead of raw value
 def test_store_const_as_expected():
     line = 'const TEMP 69'
     name = get_next_symbol(line, 5)
     store_const(line, name.value, name.end)
-    assert Builtins.BUILTIN_CONST["TEMP"] == 69
+    assert Builtins.BUILTIN_CONST[name.value] == 69
 
 def test_store_const_force_error_with_string():
     line = 'const ERROR not_valid'
     name = get_next_symbol(line, 5)
     with pytest.raises(AssertionError):
         store_const(line, name.value, name.end)
+
+
+# store_macro():
+# TODO get store_macro to store tokens instead of raw values
+def test_store_macro_as_expected():
+    line = 'macro WHATEVER 69 dump end'
+    name = get_next_symbol(line, 5)
+    store_macro(line, name.value, name.end)
+    assert Builtins.BUILTIN_MACRO[name.value] == ["69", "dump"]
+
+def test_store_macro_force_error_with_recursive():
+    line = 'macro WHATEVER 69 dump WHATEVER end'
+    name = get_next_symbol(line, 5)
+    with pytest.raises(AssertionError):
+        store_macro(line, name.value, name.end)
+
 
 '''
 
@@ -274,17 +291,6 @@ def parse_macro(macro):
                     assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % i
             elif parse_word(i)[0] == TokenId.INT:
                 yield(OperandId.PUSH_INT, int(i))
-
-def parse_macro_stack(line, start, end):
-    macro_stack = []
-    start = find_next(line, end+1, lambda x: not x.isspace())
-    while line[start:find_next(line, start, lambda x: x.isspace())] != "end":
-        end = find_next(line, start, lambda x: x.isspace())
-        assert parse_word(line[start:end])[0] == TokenId.OP or parse_word(line[start:end])[0] == TokenId.INT, "ERROR: macro op value must be of type operation or integer"
-        macro_stack.append(line[start:end])
-        start = find_next(line, end+1, lambda x: not x.isspace())
-    end = find_next(line, start, lambda x: x.isspace())
-    return (macro_stack, start, end)
 
 
 
