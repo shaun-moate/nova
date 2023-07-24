@@ -101,6 +101,18 @@ def store_macro(line, name, start):
     else:
         assert False, "ERROR: when establishing a macro you must supply an `end` symbol - no `end` found on line"
 
+# TODO Add typing to functions including expected return types
+def lex_macro_from_builtins(macro):
+    if macro in Builtins.BUILTIN_MACRO:
+        instructions = Builtins.BUILTIN_MACRO[macro]
+        for token in instructions:
+            if token[1] in Builtins.BUILTIN_OPS:
+                yield(Builtins.BUILTIN_OPS[token[1]], token[1])
+            elif isinstance(int(token[1]), int):
+                yield(OperandId.PUSH_INT, int(token[1]))
+            else:
+                assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % token[1]
+
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
@@ -173,7 +185,7 @@ def parse_token_as_op(token: Token):
                         mem_addr = -1,
                         location = token.location,
                         value    = value)
-                for (action, value) in parse_macro(token.value)]
+                for (action, value) in lex_macro_from_builtins(token.value)]
     elif token.typ == TokenId.CONST:
         if token.value in Builtins.BUILTIN_CONST:
             return Operand(action   = OperandId.PUSH_INT,
@@ -205,14 +217,4 @@ def parse_tokens_from_file(input_file_path: str):
                 for (col, (token_type, token_value)) in lex_line_to_tokens(line.split("//")[0])]
         return program
 
-def parse_macro(macro):
-    if macro in Builtins.BUILTIN_MACRO:
-        instructions = Builtins.BUILTIN_MACRO[macro]
-        for token in instructions:
-            if token[1] in Builtins.BUILTIN_OPS:
-                yield(Builtins.BUILTIN_OPS[token[1]], token[1])
-            elif isinstance(int(token[1]), int):
-                yield(OperandId.PUSH_INT, int(token[1]))
-            else:
-                assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % token[1]
 

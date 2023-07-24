@@ -173,7 +173,56 @@ def test_store_macro_force_error_with_recursive():
         store_macro(line, name.value, name.end)
 
 
+# lex_macro_from_builtins()
+def test_lex_macro_from_builtins_as_expected():
+    result = list(lex_macro_from_builtins('write'))
+    assert result == [(OperandId.PUSH_INT, 1), (OperandId.PUSH_INT, 1), (OperandId.SYSCALL, 'syscall')]
+
+def test_lex_macro_from_builtins_new_macro():
+    line = 'macro testtest 69 dump end'
+    name = get_next_symbol(line, 5)
+    store_macro(line, name.value, name.end)
+    result = list(lex_macro_from_builtins('testtest'))
+    assert result == [(OperandId.PUSH_INT, 69), (OperandId.DUMP, 'dump')]
+
+# TODO implement capability to store strings in a macro
+# TODO add test to /tests for simulation and compilation test
+def test_lex_macro_from_builtins_new_macro_with_string():
+    pass
+    # line = 'macro hello "Hello!" 1 1 syscall end'
+    # name = get_next_symbol(line, 5)
+    # store_macro(line, name.value, name.end)
+    # result = list(lex_macro_from_builtins('hello'))
+    # assert result == [(OperandId.PUSH_INT, 69), (OperandId.DUMP, 'dump')]
+
+# TODO implement ability for use of other macros is a macro (ala. 'write')
+# TODO add test to /tests for simulation and compilation test
+def test_lex_macro_from_builtins_new_macro_with_macro():
+    pass
+    # line = 'macro hellomacro "Hello!... macro" write end'
+    # name = get_next_symbol(line, 5)
+    # store_macro(line, name.value, name.end)
+    # result = list(lex_macro_from_builtins('hellomacro'))
+    # assert result == [(OperandId.PUSH_INT, 69), (OperandId.DUMP, 'dump')]
+
+# TODO consider implementation of recursive macro
+# TODO add test to /tests for simulation and compilation test
+def test_lex_macro_from_builtins_new_macro_recursive():
+    pass
+
+
 '''
+
+def parse_tokens_from_file(input_file_path: str):
+    with open(input_file_path, "r") as file:
+        return [Token(typ      = token_type,
+                      location = FileLocation(input_file_path, row+1, col+1),
+                      value    = token_value)
+                for (row, line) in enumerate(file.readlines())
+                for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
+
+
+
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
@@ -247,7 +296,7 @@ def parse_token_as_op(token: Token):
                         mem_addr = -1,
                         location = token.location,
                         value    = value)
-                for (action, value) in parse_macro(token.value)]
+                for (action, value) in lex_macro_from_builtins(token.value)]
     elif token.typ == TokenId.CONST:
         if token.value in Builtins.BUILTIN_CONST:
             return Operand(action   = OperandId.PUSH_INT,
@@ -269,27 +318,6 @@ def parse_token_as_op(token: Token):
                        value    = token.value)
     else:
         assert False, "TokenId type is unreachable is unreachable"
-
-def parse_tokens_from_file(input_file_path: str):
-    with open(input_file_path, "r") as file:
-        return [Token(typ      = token_type,
-                      location = FileLocation(input_file_path, row+1, col+1),
-                      value    = token_value)
-                for (row, line) in enumerate(file.readlines())
-                for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
-
-def parse_macro(macro):
-    instructions = Builtins.BUILTIN_MACRO[macro]
-    if macro in Builtins.BUILTIN_MACRO:
-        for i in instructions:
-            if parse_word(i)[0] == TokenId.OP:
-                if i in Builtins.BUILTIN_OPS:
-                    yield(Builtins.BUILTIN_OPS[i], i)
-                else:
-                    assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % i
-            elif parse_word(i)[0] == TokenId.INT:
-                yield(OperandId.PUSH_INT, int(i))
-
 
 
 '''
