@@ -247,7 +247,6 @@ def test_lex_tokens_from_file_arithmetic_divide():
 def test_lex_tokens_from_file_arithmetic_mod():
     pass
 
-# TODO implement tests for logical-operators
 def test_lex_tokens_from_file_logical_operator_equal():
     result = lex_tokens_from_file('tests/logical-operator-equal.nv')
     assert result == [
@@ -302,13 +301,6 @@ def test_lex_tokens_from_file_logical_operator_less_than_or_equal_to():
                       Token(TokenId.OP, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 10), 'dump')
                      ]
 
-## TODO Add 'and' as a logical operator
-def test_lex_tokens_from_file_logical_operator_and():
-    pass
-
-## TODO Add 'or' as a logical operator
-def test_lex_tokens_from_file_logical_operator_or():
-    pass
 
 def test_lex_tokens_from_file_stack_operator_dump():
     result = lex_tokens_from_file('tests/stack-operator-dump.nv')
@@ -371,6 +363,132 @@ def test_lex_tokens_from_file_stack_operator_over():
 # TODO implement tests for bitwise-operators
 # TODO implement tests for buffer-operators
 
+def test_lex_tokens_from_file_conditional_if():
+    result = lex_tokens_from_file('tests/conditional-if.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/conditional-if.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/conditional-if.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if.nv', 2, 7), '=='),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if.nv', 2, 10), 'if'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-if.nv', 3, 3), 420),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if.nv', 3, 7), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if.nv', 4, 1), 'fi'),
+                     ]
+
+def test_lex_tokens_from_file_conditional_if_else():
+    result = lex_tokens_from_file('tests/conditional-if-else.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/conditional-if-else.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/conditional-if-else.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if-else.nv', 2, 7), '!='),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if-else.nv', 2, 10), 'if'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-if-else.nv', 3, 5), 420),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if-else.nv', 3, 9), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if-else.nv', 4, 1), 'else'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-if-else.nv', 5, 5), 6969),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if-else.nv', 5, 10), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-if-else.nv', 6, 1), 'fi'),
+                     ]
+
+def test_lex_tokens_from_file_conditional_nested_if_else():
+    result = lex_tokens_from_file('tests/conditional-nested-if-else.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 2, 1), 34),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 2, 4), 35),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 2, 7), '+'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 2, 9), 69),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 2, 12), '!='),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 2, 15), 'if'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 3, 4), 10),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 3, 7), 10),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 3, 10), '!='),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 3, 13), 'if'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 4, 7), 13),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 4, 10), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 5, 4), 'else'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 6, 7), 69),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 6, 10), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 7, 4), 'fi'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 8, 1), 'else'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 9, 4), 420),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 9, 8), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-if-else.nv', 10, 1), 'fi'),
+                     ]
+
+def test_lex_tokens_from_file_conditional_while():
+    result = lex_tokens_from_file('tests/conditional-while-loop.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/conditional-while-loop.nv', 2, 1), 69),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 3, 1), 'while'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 3, 7), 'dup'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-while-loop.nv', 3, 11), 0),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 3, 13), '>'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 3, 15), 'do'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 4, 4), 'dup'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 4, 8), 'dump'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-while-loop.nv', 5, 4), 1),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 5, 6), '-'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 6, 1), 'done'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 7, 1), 'drop'),
+                     ]
+
+def test_lex_tokens_from_file_conditional_nested_while_if():
+    result = lex_tokens_from_file('tests/conditional-nested-while-if-loop.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 1), 0),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 3), 'while'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 9), 'dup'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 13), 5),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 15), '<='),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 18), 'do'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 3, 4), 'dup'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-if-loop.nv', 3, 8), 3),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 3, 10), '=='),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 3, 13), 'if'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 4, 7), 'dup'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 4, 11), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 5, 4), 'fi'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-if-loop.nv', 6, 4), 1),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 6, 6), '+'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 7, 1), 'done'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 7, 6), 'drop'),
+                     ]
+
+def test_lex_tokens_from_file_conditional_nested_while():
+    result = lex_tokens_from_file('tests/conditional-nested-while-loop.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 2, 1), 0),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 2, 3), 'while'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 2, 9), 'dup'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 2, 13), 5),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 2, 15), '<'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 2, 17), 'do'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 3, 3), 0),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 3, 5), 'while'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 3, 11), 'dup'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 3, 15), 3),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 3, 17), '<'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 3, 19), 'do'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 4, 5), 'dup'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 4, 9), 'dump'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 5, 5), 1),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 5, 7), '+'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 6, 3), 'done'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 6, 8), 'drop'),
+                      Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 7, 3), 1),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 7, 5), '+'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 8, 1), 'done'),
+                      Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 8, 6), 'drop'),
+                     ]
+
+## TODO Add 'and'
+def test_lex_tokens_from_file_conditional_and():
+    pass
+
+## TODO Add 'or'
+def test_lex_tokens_from_file_conditional_or():
+    pass
+
 def test_lex_tokens_from_file_local_macro():
     result = lex_tokens_from_file('tests/local-macro.nv')
     assert result == [
@@ -383,7 +501,6 @@ def test_lex_tokens_from_file_local_const():
                       Token(TokenId.CONST, FileLocation('tests/local-constant.nv', 3, 1), 'HELLO'),
                       Token(TokenId.OP, FileLocation('tests/local-constant.nv', 3, 7), 'dump'),
                      ]
-
 
 
 '''

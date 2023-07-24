@@ -3,8 +3,15 @@ from nova.builtins import Builtins, OperandId, TokenId
 from nova.dataclasses import Symbol, FileLocation, Token, Operand, Program
 
 
-# TODO implement Tokenizer class (which tokenizes a file)
-# TODO implement Lexer as a class (which runs lexical analysis over tokens: generate blocks etc)
+# TODO implement Tokenizer class (which tokenizes a file) - breaks a stream of text into tokens, usually by looking for whitespace (tabs, spaces, new lines).
+# TODO implement Lexer as a class (which runs lexical analysis over tokens: generate blocks etc) - is basically a tokenizer, but it usually attaches extra context to the tokens
+# TODO implement Parser class (which tokenizes a file) - takes the stream of tokens from the lexer and turns it into an abstract syntax tree representing the (usually) program represented by the original text. 
+
+# Tokenizer will remove any comments, and only return tokens to the Lexer.
+# Lexer will define scopes for those tokens (variables/functions)
+# Parser then will build the code/program structure
+
+# TODO add 'import' functionality to create a standard library (initialising macros, consts from library)
 
 def get_next_symbol(line: str, start: int):
     token_start = find_next(line, start, lambda x : not x.isspace()) 
@@ -48,7 +55,7 @@ def lex_line_to_tokens(line: str):
         symbol = get_next_symbol(line, start)
         if symbol.string:
             end = symbol.end
-            yield(start, assign_token_type(symbol.value, typ="str"))
+            yield(symbol.start, assign_token_type(symbol.value, typ="str"))
         elif symbol.value == "macro":
             name = get_next_symbol(line, symbol.end)
             if name.value in Builtins.BUILTIN_MACRO:
@@ -56,7 +63,7 @@ def lex_line_to_tokens(line: str):
             end = store_macro(line, name.value, name.end)
         elif symbol.value in Builtins.BUILTIN_MACRO:
             end = symbol.end
-            yield(start, assign_token_type(symbol.value, typ="macro"))
+            yield(symbol.start, assign_token_type(symbol.value, typ="macro"))
         elif symbol.value == "const":
             name = get_next_symbol(line, symbol.end)
             if name.value in Builtins.BUILTIN_CONST:
@@ -64,13 +71,13 @@ def lex_line_to_tokens(line: str):
             end = store_const(line, name.value, name.end)
         elif symbol.value in Builtins.BUILTIN_CONST:
             end = symbol.end
-            yield(start, assign_token_type(line[start:end], typ="const"))
+            yield(symbol.start, assign_token_type(line[start:end], typ="const"))
         elif symbol.value in Builtins.BUILTIN_OPS:
             end = symbol.end
-            yield(start, assign_token_type(symbol.value, typ="op"))
+            yield(symbol.start, assign_token_type(symbol.value, typ="op"))
         else:
             end = symbol.end
-            yield(start, assign_token_type(symbol.value, "int"))
+            yield(symbol.start, assign_token_type(symbol.value, "int"))
         start = end+1
 
 def store_const(line, name, start):

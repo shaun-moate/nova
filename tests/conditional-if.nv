@@ -1,4 +1,4 @@
 // if (69 == 69) then print(420) end, result = 420
 69 69 == if
-    420 dump
+  420 dump
 fi
