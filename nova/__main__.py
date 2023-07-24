@@ -4,7 +4,7 @@ import sys
 import subprocess
 
 from nova.helpers import uncons, usage
-from nova.lexer import parse_program_from_file
+from nova.old import parse_program_from_file
 from nova.simulator import simulate_program
 from nova.compiler import compile_program
 

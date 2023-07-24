@@ -11,10 +11,23 @@ class Symbol:
     string:    bool
 
 @dataclass
+class Word:
+    start:     int
+    end:       int
+    value:     str
+    string:    bool
+
+@dataclass
 class FileLocation:
     file_path: str
     row:       int
     col:       int
+
+@dataclass
+class RawToken:
+    location:       FileLocation
+    string_literal: bool
+    value:          str
 
 @dataclass
 class Token:
@@ -29,8 +42,10 @@ class Operand:
     mem_addr:  int
     location:  FileLocation
     value:     int | str | None
+
     def __getitem__(self, index):
         return self[index]
+
     def __len__(self):
         return len(self)
 
