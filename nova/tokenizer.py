@@ -1,5 +1,3 @@
-# TODO implement Tokenizer class (which tokenizes a file) - breaks a stream of text into tokens, usually by looking for whitespace (tabs, spaces, new lines).
-# Tokenizer will remove any comments, and only return tokens to the Lexer.
 from typing import Generator
 from nova.helpers import find_next
 from nova.dataclasses import Word, FileLocation, RawToken
@@ -7,7 +5,7 @@ from nova.dataclasses import Word, FileLocation, RawToken
 class Tokenizer():
     def __init__(self, file_path: str):
         self.file_path = file_path
-        self.tokens = []
+        self.raw_tokens = []
         self.lex_tokens_from_file()
 
     def lex_tokens_from_file(self):
@@ -24,7 +22,7 @@ class Tokenizer():
                         )
                     for (line_number, line) in enumerate(file.readlines())
                     for word in self.lex_line_to_words(line.split("//")[0])]
-            self.tokens = tokens
+            self.raw_tokens = tokens
 
     def lex_line_to_words(self, line: str) -> Generator[Word, None, None]:
         start = 0

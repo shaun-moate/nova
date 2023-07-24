@@ -4,7 +4,7 @@ from nova.dataclasses import FileLocation, Word, RawToken
 # lex_tokens_from_file():
 def test_lex_tokens_from_file_arithmetic_plus():
     tokenizer = Tokenizer('tests/arithmetic-plus.nv')
-    assert tokenizer.tokens == [
+    assert tokenizer.raw_tokens == [
                       RawToken(FileLocation('tests/arithmetic-plus.nv', 2, 1), False, '34'),
                       RawToken(FileLocation('tests/arithmetic-plus.nv', 2, 4), False, '35'),
                       RawToken(FileLocation('tests/arithmetic-plus.nv', 2, 7), False, '+'),
@@ -13,7 +13,7 @@ def test_lex_tokens_from_file_arithmetic_plus():
 
 def test_lex_tokens_from_file_arithmetic_minus():
     tokenizer = Tokenizer('tests/arithmetic-minus.nv')
-    assert tokenizer.tokens == [
+    assert tokenizer.raw_tokens == [
                       RawToken(FileLocation('tests/arithmetic-minus.nv', 2, 1), False, '500'),
                       RawToken(FileLocation('tests/arithmetic-minus.nv', 2, 5), False, '80'),
                       RawToken(FileLocation('tests/arithmetic-minus.nv', 2, 8), False, '-'),
@@ -22,7 +22,7 @@ def test_lex_tokens_from_file_arithmetic_minus():
 
 def test_lex_tokens_from_file_arithmetic_multiply():
     tokenizer = Tokenizer('tests/arithmetic-multiply.nv')
-    assert tokenizer.tokens == [
+    assert tokenizer.raw_tokens == [
                       RawToken(FileLocation('tests/arithmetic-multiply.nv', 2, 1), False, '3'),
                       RawToken(FileLocation('tests/arithmetic-multiply.nv', 2, 3), False, '23'),
                       RawToken(FileLocation('tests/arithmetic-multiply.nv', 2, 6), False, '*'),

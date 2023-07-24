@@ -90,12 +90,12 @@ class Builtins:
     }
 
     BUILTIN_CONST = {
-        "CATCH":   (TokenId.INT, 22),
+        "CATCH":   22,
     }
 
     ## TODO: add MACROS to examples to improve readability -> ie. rule110.nv
     BUILTIN_MACRO = {
-        "write":   [(TokenId.INT, 1), (TokenId.INT, 1), (TokenId.OP, 'syscall')],
+        "write":   [1, 1, 'syscall'],
     }
 
 
