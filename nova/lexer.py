@@ -113,12 +113,21 @@ def lex_macro_from_builtins(macro):
             else:
                 assert False, "ERROR: `%s` not found in Builtins.BUILTIN_OPS" % token[1]
 
+def lex_tokens_from_file(input_file_path: str):
+    with open(input_file_path, "r") as file:
+        program = [Token(typ      = token_type,
+                      location = FileLocation(input_file_path, line_number+1, col+1),
+                      value    = token_value)
+                for (line_number, line) in enumerate(file.readlines())
+                for (col, (token_type, token_value)) in lex_line_to_tokens(line.split("//")[0])]
+        return program
+
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
         return generate_blocks(
                     Program(operands = [parse_token_as_op(token) 
-                                        for token in parse_tokens_from_file(input_file_path)])
+                                        for token in lex_tokens_from_file(input_file_path)])
                 )
 
 def unnest_program(program: Program):
@@ -207,14 +216,5 @@ def parse_token_as_op(token: Token):
                        value    = token.value)
     else:
         assert False, "TokenId type is unreachable is unreachable"
-
-def parse_tokens_from_file(input_file_path: str):
-    with open(input_file_path, "r") as file:
-        program = [Token(typ      = token_type,
-                      location = FileLocation(input_file_path, line_number+1, col+1),
-                      value    = token_value)
-                for (line_number, line) in enumerate(file.readlines())
-                for (col, (token_type, token_value)) in lex_line_to_tokens(line.split("//")[0])]
-        return program
 
 

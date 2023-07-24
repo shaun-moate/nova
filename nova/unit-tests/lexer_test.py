@@ -211,6 +211,43 @@ def test_lex_macro_from_builtins_new_macro_recursive():
     pass
 
 
+## lex_tokens_from_file
+def test_lex_tokens_from_file_arithmetic_plus():
+    result = lex_tokens_from_file('tests/arithmetic-plus.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/arithmetic-plus.nv', 2, 1), 34),
+                      Token(TokenId.INT, FileLocation('tests/arithmetic-plus.nv', 2, 4), 35),
+                      Token(TokenId.OP, FileLocation('tests/arithmetic-plus.nv', 2, 7), '+'),
+                      Token(TokenId.OP, FileLocation('tests/arithmetic-plus.nv', 2, 9), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_arithmetic_minus():
+    result = lex_tokens_from_file('tests/arithmetic-minus.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/arithmetic-minus.nv', 2, 1), 500),
+                      Token(TokenId.INT, FileLocation('tests/arithmetic-minus.nv', 2, 5), 80),
+                      Token(TokenId.OP, FileLocation('tests/arithmetic-minus.nv', 2, 8), '-'),
+                      Token(TokenId.OP, FileLocation('tests/arithmetic-minus.nv', 2, 10), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_arithmetic_multiply():
+    result = lex_tokens_from_file('tests/arithmetic-multiply.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/arithmetic-multiply.nv', 2, 1), 3),
+                      Token(TokenId.INT, FileLocation('tests/arithmetic-multiply.nv', 2, 3), 23),
+                      Token(TokenId.OP, FileLocation('tests/arithmetic-multiply.nv', 2, 6), '*'),
+                      Token(TokenId.OP, FileLocation('tests/arithmetic-multiply.nv', 2, 8), 'dump')
+                     ]
+
+# TODO implement divide
+def test_lex_tokens_from_file_arithmetic_divide():
+    pass
+
+# TODO implement modulo
+def test_lex_tokens_from_file_arithmetic_mod():
+    pass
+
+
 '''
 
 def parse_tokens_from_file(input_file_path: str):
