@@ -361,7 +361,40 @@ def test_lex_tokens_from_file_stack_operator_over():
                      ]
 
 # TODO implement tests for bitwise-operators
-# TODO implement tests for buffer-operators
+
+def test_lex_tokens_from_file_buffer_string_literal():
+    result = lex_tokens_from_file('tests/buffer-string-literal.nv')
+    assert result == [
+                      Token(TokenId.STR, FileLocation('tests/buffer-string-literal.nv', 1, 1), 'Hello, World!\n'),
+                      Token(TokenId.MACRO, FileLocation('tests/buffer-string-literal.nv', 1, 19), 'write'),
+                      Token(TokenId.STR, FileLocation('tests/buffer-string-literal.nv', 2, 1), 'Whatcha Doing!\n'),
+                      Token(TokenId.MACRO, FileLocation('tests/buffer-string-literal.nv', 2, 20), 'write'),
+                     ]
+
+def test_lex_tokens_from_file_buffer_store_single_bytes():
+    result = lex_tokens_from_file('tests/buffer-store-single-bytes.nv')
+    assert result == [
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 2, 1), 'mem'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 2, 5), 0),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 2, 7), '+'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 2, 9), 97),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 2, 12), 'store8'),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 3, 1), 'mem'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 3, 5), 1),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 3, 7), '+'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 3, 9), 98),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 3, 12), 'store8'),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 4, 1), 'mem'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 4, 5), 2),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 4, 7), '+'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 4, 9), 99),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 4, 12), 'store8'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 5, 1), 3),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 5, 3), 'mem'),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 5, 7), 1),
+                      Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 5, 9), 1),
+                      Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 5, 11), 'syscall'),
+                     ]
 
 def test_lex_tokens_from_file_conditional_if():
     result = lex_tokens_from_file('tests/conditional-if.nv')
