@@ -302,7 +302,72 @@ def test_lex_tokens_from_file_logical_operator_less_than_or_equal_to():
                       Token(TokenId.OP, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 10), 'dump')
                      ]
 
-# TODO implement tests for stack-operators
+## TODO Add 'and' as a logical operator
+def test_lex_tokens_from_file_logical_operator_and():
+    pass
+
+## TODO Add 'or' as a logical operator
+def test_lex_tokens_from_file_logical_operator_or():
+    pass
+
+def test_lex_tokens_from_file_stack_operator_dump():
+    result = lex_tokens_from_file('tests/stack-operator-dump.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-dump.nv', 2, 1), 69),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-dump.nv', 2, 4), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_stack_operator_drop():
+    result = lex_tokens_from_file('tests/stack-operator-drop.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-drop.nv', 2, 1), 420),
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-drop.nv', 2, 5), 69),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-drop.nv', 2, 8), 'drop'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-drop.nv', 2, 13), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_stack_operator_duplicate():
+    result = lex_tokens_from_file('tests/stack-operator-duplicate.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-duplicate.nv', 2, 1), 69),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-duplicate.nv', 2, 4), 'dup'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-duplicate.nv', 2, 8), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-duplicate.nv', 2, 13), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_stack_operator_2duplicate():
+    result = lex_tokens_from_file('tests/stack-operator-2duplicate.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-2duplicate.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-2duplicate.nv', 2, 4), 420),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-2duplicate.nv', 2, 8), '2dup'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-2duplicate.nv', 2, 13), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-2duplicate.nv', 2, 18), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-2duplicate.nv', 2, 23), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-2duplicate.nv', 2, 28), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_stack_operator_swap():
+    result = lex_tokens_from_file('tests/stack-operator-swap.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-swap.nv', 2, 1), 1),
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-swap.nv', 2, 3), 2),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-swap.nv', 2, 5), 'swap'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-swap.nv', 2, 10), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-swap.nv', 2, 15), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_stack_operator_over():
+    result = lex_tokens_from_file('tests/stack-operator-over.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-over.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/stack-operator-over.nv', 2, 4), 420),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-over.nv', 2, 8), 'over'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-over.nv', 2, 13), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-over.nv', 2, 18), 'dump'),
+                      Token(TokenId.OP, FileLocation('tests/stack-operator-over.nv', 2, 23), 'dump'),
+                     ]
+
 # TODO implement tests for bitwise-operators
 # TODO implement tests for buffer-operators
 
