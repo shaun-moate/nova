@@ -360,7 +360,41 @@ def test_lex_tokens_from_file_stack_operator_over():
                       Token(TokenId.OP, FileLocation('tests/stack-operator-over.nv', 2, 23), 'dump'),
                      ]
 
-# TODO implement tests for bitwise-operators
+def test_lex_tokens_from_file_bitwise_operator_and():
+    result = lex_tokens_from_file('tests/bitwise-operator-and.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-and.nv', 2, 1), 2),
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-and.nv', 2, 3), 3),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-and.nv', 2, 5), 'band'),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-and.nv', 2, 10), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_bitwise_operator_or():
+    result = lex_tokens_from_file('tests/bitwise-operator-or.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-or.nv', 2, 1), 2),
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-or.nv', 2, 3), 3),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-or.nv', 2, 5), 'bor'),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-or.nv', 2, 9), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_bitwise_operator_shift_left():
+    result = lex_tokens_from_file('tests/bitwise-operator-shift-left.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-left.nv', 2, 1), 1),
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-left.nv', 2, 3), 3),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-shift-left.nv', 2, 5), 'shl'),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-shift-left.nv', 2, 9), 'dump'),
+                     ]
+
+def test_lex_tokens_from_file_bitwise_operator_shift_right():
+    result = lex_tokens_from_file('tests/bitwise-operator-shift-right.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-right.nv', 2, 1), 2),
+                      Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-right.nv', 2, 3), 1),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-shift-right.nv', 2, 5), 'shr'),
+                      Token(TokenId.OP, FileLocation('tests/bitwise-operator-shift-right.nv', 2, 9), 'dump'),
+                     ]
 
 def test_lex_tokens_from_file_buffer_string_literal():
     result = lex_tokens_from_file('tests/buffer-string-literal.nv')
@@ -535,19 +569,7 @@ def test_lex_tokens_from_file_local_const():
                       Token(TokenId.OP, FileLocation('tests/local-constant.nv', 3, 7), 'dump'),
                      ]
 
-
 '''
-
-def parse_tokens_from_file(input_file_path: str):
-    with open(input_file_path, "r") as file:
-        return [Token(typ      = token_type,
-                      location = FileLocation(input_file_path, row+1, col+1),
-                      value    = token_value)
-                for (row, line) in enumerate(file.readlines())
-                for (col, (token_type, token_value)) in parse_line(line.split("//")[0])]
-
-
-
 
 def parse_program_from_file(input_file_path: str) -> Program:
     with open(input_file_path, "r"):
