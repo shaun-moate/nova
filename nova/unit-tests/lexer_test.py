@@ -247,6 +247,65 @@ def test_lex_tokens_from_file_arithmetic_divide():
 def test_lex_tokens_from_file_arithmetic_mod():
     pass
 
+# TODO implement tests for logical-operators
+def test_lex_tokens_from_file_logical_operator_equal():
+    result = lex_tokens_from_file('tests/logical-operator-equal.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-equal.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-equal.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-equal.nv', 2, 7), '=='),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-equal.nv', 2, 10), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_logical_operator_not_equal():
+    result = lex_tokens_from_file('tests/logical-operator-not-equal.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-not-equal.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-not-equal.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-not-equal.nv', 2, 7), '!='),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-not-equal.nv', 2, 10), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_logical_operator_greater_than():
+    result = lex_tokens_from_file('tests/logical-operator-greater-than.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-greater-than.nv', 2, 7), '>'),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-greater-than.nv', 2, 9), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_logical_operator_greater_than_or_equal_to():
+    result = lex_tokens_from_file('tests/logical-operator-greater-than-or-equal.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than-or-equal.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than-or-equal.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-greater-than-or-equal.nv', 2, 7), '>='),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-greater-than-or-equal.nv', 2, 10), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_logical_operator_less_than():
+    result = lex_tokens_from_file('tests/logical-operator-less-than.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-less-than.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-less-than.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-less-than.nv', 2, 7), '<'),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-less-than.nv', 2, 9), 'dump')
+                     ]
+
+def test_lex_tokens_from_file_logical_operator_less_than_or_equal_to():
+    result = lex_tokens_from_file('tests/logical-operator-less-than-or-equal.nv')
+    assert result == [
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 1), 69),
+                      Token(TokenId.INT, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 4), 69),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 7), '<='),
+                      Token(TokenId.OP, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 10), 'dump')
+                     ]
+
+# TODO implement tests for stack-operators
+# TODO implement tests for bitwise-operators
+# TODO implement tests for buffer-operators
+
 def test_lex_tokens_from_file_local_macro():
     result = lex_tokens_from_file('tests/local-macro.nv')
     assert result == [
