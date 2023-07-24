@@ -96,7 +96,7 @@ def test_lex_line_to_tokens_with_string():
             ]
 
 def test_lex_line_to_tokens_with_new_macro():
-    line = 'macro write69 69 dump end'
+    line = 'macro write669 69 dump end'
     tokens = list(lex_line_to_tokens(line))
     assert tokens == []
 
@@ -246,6 +246,20 @@ def test_lex_tokens_from_file_arithmetic_divide():
 # TODO implement modulo
 def test_lex_tokens_from_file_arithmetic_mod():
     pass
+
+def test_lex_tokens_from_file_local_macro():
+    result = lex_tokens_from_file('tests/local-macro.nv')
+    assert result == [
+                      Token(TokenId.MACRO, FileLocation('tests/local-macro.nv', 4, 1), 'write69'),
+                     ]
+
+def test_lex_tokens_from_file_local_const():
+    result = lex_tokens_from_file('tests/local-constant.nv')
+    assert result == [
+                      Token(TokenId.CONST, FileLocation('tests/local-constant.nv', 3, 1), 'HELLO'),
+                      Token(TokenId.OP, FileLocation('tests/local-constant.nv', 3, 7), 'dump'),
+                     ]
+
 
 
 '''
