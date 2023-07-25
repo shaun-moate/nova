@@ -1,10 +1,13 @@
 import pytest
+from nova.tokenizer import Tokenizer
 from nova.lexer import Lexer
 from nova.dataclasses import FileLocation, TokenId, Token
 
 # lex_tokens():
 def test_lex_tokens_from_file_arithmetic_plus():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
+    print(lexer.tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/arithmetic-plus.nv', 2, 1), 34),
                       Token(TokenId.INT, FileLocation('tests/arithmetic-plus.nv', 2, 4), 35),
@@ -13,7 +16,8 @@ def test_lex_tokens_from_file_arithmetic_plus():
                      ]
 
 def test_lex_tokens_from_file_arithmetic_minus():
-    lexer = Lexer('tests/arithmetic-minus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-minus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/arithmetic-minus.nv', 2, 1), 500),
                       Token(TokenId.INT, FileLocation('tests/arithmetic-minus.nv', 2, 5), 80),
@@ -22,7 +26,8 @@ def test_lex_tokens_from_file_arithmetic_minus():
                      ]
 
 def test_lex_tokens_from_file_arithmetic_multiply():
-    lexer = Lexer('tests/arithmetic-multiply.nv')
+    tokenizer = Tokenizer('tests/arithmetic-multiply.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/arithmetic-multiply.nv', 2, 1), 3),
                       Token(TokenId.INT, FileLocation('tests/arithmetic-multiply.nv', 2, 3), 23),
@@ -39,7 +44,8 @@ def test_lex_tokens_from_file_arithmetic_mod():
     pass
 
 def test_lex_tokens_from_file_logical_operator_equal():
-    lexer = Lexer('tests/logical-operator-equal.nv')
+    tokenizer = Tokenizer('tests/logical-operator-equal.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/logical-operator-equal.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/logical-operator-equal.nv', 2, 4), 69),
@@ -48,7 +54,8 @@ def test_lex_tokens_from_file_logical_operator_equal():
                      ]
 
 def test_lex_tokens_from_file_logical_operator_not_equal():
-    lexer = Lexer('tests/logical-operator-not-equal.nv')
+    tokenizer = Tokenizer('tests/logical-operator-not-equal.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/logical-operator-not-equal.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/logical-operator-not-equal.nv', 2, 4), 69),
@@ -57,7 +64,8 @@ def test_lex_tokens_from_file_logical_operator_not_equal():
                      ]
 
 def test_lex_tokens_from_file_logical_operator_greater_than():
-    lexer = Lexer('tests/logical-operator-greater-than.nv')
+    tokenizer = Tokenizer('tests/logical-operator-greater-than.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than.nv', 2, 4), 69),
@@ -66,7 +74,8 @@ def test_lex_tokens_from_file_logical_operator_greater_than():
                      ]
 
 def test_lex_tokens_from_file_logical_operator_greater_than_or_equal_to():
-    lexer = Lexer('tests/logical-operator-greater-than-or-equal.nv')
+    tokenizer = Tokenizer('tests/logical-operator-greater-than-or-equal.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than-or-equal.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/logical-operator-greater-than-or-equal.nv', 2, 4), 69),
@@ -75,7 +84,8 @@ def test_lex_tokens_from_file_logical_operator_greater_than_or_equal_to():
                      ]
 
 def test_lex_tokens_from_file_logical_operator_less_than():
-    lexer = Lexer('tests/logical-operator-less-than.nv')
+    tokenizer = Tokenizer('tests/logical-operator-less-than.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/logical-operator-less-than.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/logical-operator-less-than.nv', 2, 4), 69),
@@ -84,7 +94,8 @@ def test_lex_tokens_from_file_logical_operator_less_than():
                      ]
 
 def test_lex_tokens_from_file_logical_operator_less_than_or_equal_to():
-    lexer = Lexer('tests/logical-operator-less-than-or-equal.nv')
+    tokenizer = Tokenizer('tests/logical-operator-less-than-or-equal.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/logical-operator-less-than-or-equal.nv', 2, 4), 69),
@@ -94,14 +105,16 @@ def test_lex_tokens_from_file_logical_operator_less_than_or_equal_to():
 
 
 def test_lex_tokens_from_file_stack_operator_dump():
-    lexer = Lexer('tests/stack-operator-dump.nv')
+    tokenizer = Tokenizer('tests/stack-operator-dump.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/stack-operator-dump.nv', 2, 1), 69),
                       Token(TokenId.OP, FileLocation('tests/stack-operator-dump.nv', 2, 4), 'dump'),
                      ]
 
 def test_lex_tokens_from_file_stack_operator_drop():
-    lexer = Lexer('tests/stack-operator-drop.nv')
+    tokenizer = Tokenizer('tests/stack-operator-drop.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/stack-operator-drop.nv', 2, 1), 420),
                       Token(TokenId.INT, FileLocation('tests/stack-operator-drop.nv', 2, 5), 69),
@@ -110,7 +123,8 @@ def test_lex_tokens_from_file_stack_operator_drop():
                      ]
 
 def test_lex_tokens_from_file_stack_operator_duplicate():
-    lexer = Lexer('tests/stack-operator-duplicate.nv')
+    tokenizer = Tokenizer('tests/stack-operator-duplicate.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/stack-operator-duplicate.nv', 2, 1), 69),
                       Token(TokenId.OP, FileLocation('tests/stack-operator-duplicate.nv', 2, 4), 'dup'),
@@ -119,7 +133,8 @@ def test_lex_tokens_from_file_stack_operator_duplicate():
                      ]
 
 def test_lex_tokens_from_file_stack_operator_2duplicate():
-    lexer = Lexer('tests/stack-operator-2duplicate.nv')
+    tokenizer = Tokenizer('tests/stack-operator-2duplicate.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/stack-operator-2duplicate.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/stack-operator-2duplicate.nv', 2, 4), 420),
@@ -131,7 +146,8 @@ def test_lex_tokens_from_file_stack_operator_2duplicate():
                      ]
 
 def test_lex_tokens_from_file_stack_operator_swap():
-    lexer = Lexer('tests/stack-operator-swap.nv')
+    tokenizer = Tokenizer('tests/stack-operator-swap.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/stack-operator-swap.nv', 2, 1), 1),
                       Token(TokenId.INT, FileLocation('tests/stack-operator-swap.nv', 2, 3), 2),
@@ -141,7 +157,8 @@ def test_lex_tokens_from_file_stack_operator_swap():
                      ]
 
 def test_lex_tokens_from_file_stack_operator_over():
-    lexer = Lexer('tests/stack-operator-over.nv')
+    tokenizer = Tokenizer('tests/stack-operator-over.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/stack-operator-over.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/stack-operator-over.nv', 2, 4), 420),
@@ -152,7 +169,8 @@ def test_lex_tokens_from_file_stack_operator_over():
                      ]
 
 def test_lex_tokens_from_file_bitwise_operator_and():
-    lexer = Lexer('tests/bitwise-operator-and.nv')
+    tokenizer = Tokenizer('tests/bitwise-operator-and.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-and.nv', 2, 1), 2),
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-and.nv', 2, 3), 3),
@@ -161,7 +179,8 @@ def test_lex_tokens_from_file_bitwise_operator_and():
                      ]
 
 def test_lex_tokens_from_file_bitwise_operator_or():
-    lexer = Lexer('tests/bitwise-operator-or.nv')
+    tokenizer = Tokenizer('tests/bitwise-operator-or.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-or.nv', 2, 1), 2),
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-or.nv', 2, 3), 3),
@@ -170,7 +189,8 @@ def test_lex_tokens_from_file_bitwise_operator_or():
                      ]
 
 def test_lex_tokens_from_file_bitwise_operator_shift_left():
-    lexer = Lexer('tests/bitwise-operator-shift-left.nv')
+    tokenizer = Tokenizer('tests/bitwise-operator-shift-left.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-left.nv', 2, 1), 1),
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-left.nv', 2, 3), 3),
@@ -179,7 +199,8 @@ def test_lex_tokens_from_file_bitwise_operator_shift_left():
                      ]
 
 def test_lex_tokens_from_file_bitwise_operator_shift_right():
-    lexer = Lexer('tests/bitwise-operator-shift-right.nv')
+    tokenizer = Tokenizer('tests/bitwise-operator-shift-right.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-right.nv', 2, 1), 2),
                       Token(TokenId.INT, FileLocation('tests/bitwise-operator-shift-right.nv', 2, 3), 1),
@@ -188,7 +209,8 @@ def test_lex_tokens_from_file_bitwise_operator_shift_right():
                      ]
 
 def test_lex_tokens_from_file_conditional_if():
-    lexer = Lexer('tests/conditional-if.nv')
+    tokenizer = Tokenizer('tests/conditional-if.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/conditional-if.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/conditional-if.nv', 2, 4), 69),
@@ -200,7 +222,8 @@ def test_lex_tokens_from_file_conditional_if():
                      ]
 
 def test_lex_tokens_from_file_conditional_if_else():
-    lexer = Lexer('tests/conditional-if-else.nv')
+    tokenizer = Tokenizer('tests/conditional-if-else.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/conditional-if-else.nv', 2, 1), 69),
                       Token(TokenId.INT, FileLocation('tests/conditional-if-else.nv', 2, 4), 69),
@@ -215,7 +238,8 @@ def test_lex_tokens_from_file_conditional_if_else():
                      ]
 
 def test_lex_tokens_from_file_conditional_nested_if_else():
-    lexer = Lexer('tests/conditional-nested-if-else.nv')
+    tokenizer = Tokenizer('tests/conditional-nested-if-else.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 2, 1), 34),
                       Token(TokenId.INT, FileLocation('tests/conditional-nested-if-else.nv', 2, 4), 35),
@@ -240,7 +264,8 @@ def test_lex_tokens_from_file_conditional_nested_if_else():
                      ]
 
 def test_lex_tokens_from_file_conditional_while():
-    lexer = Lexer('tests/conditional-while-loop.nv')
+    tokenizer = Tokenizer('tests/conditional-while-loop.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/conditional-while-loop.nv', 2, 1), 69),
                       Token(TokenId.OP, FileLocation('tests/conditional-while-loop.nv', 3, 1), 'while'),
@@ -257,7 +282,8 @@ def test_lex_tokens_from_file_conditional_while():
                      ]
 
 def test_lex_tokens_from_file_conditional_nested_while_if():
-    lexer = Lexer('tests/conditional-nested-while-if-loop.nv')
+    tokenizer = Tokenizer('tests/conditional-nested-while-if-loop.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 1), 0),
                       Token(TokenId.OP, FileLocation('tests/conditional-nested-while-if-loop.nv', 2, 3), 'while'),
@@ -279,7 +305,8 @@ def test_lex_tokens_from_file_conditional_nested_while_if():
                      ]
 
 def test_lex_tokens_from_file_conditional_nested_while():
-    lexer = Lexer('tests/conditional-nested-while-loop.nv')
+    tokenizer = Tokenizer('tests/conditional-nested-while-loop.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/conditional-nested-while-loop.nv', 2, 1), 0),
                       Token(TokenId.OP, FileLocation('tests/conditional-nested-while-loop.nv', 2, 3), 'while'),
@@ -314,20 +341,23 @@ def test_lex_tokens_from_file_conditional_or():
     pass
 
 def test_lex_tokens_from_file_local_macro():
-    lexer = Lexer('tests/local-macro.nv')
+    tokenizer = Tokenizer('tests/local-macro.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.MACRO, FileLocation('tests/local-macro.nv', 4, 1), 'write69'),
                      ]
 
 def test_lex_tokens_from_file_local_const():
-    lexer = Lexer('tests/local-constant.nv')
+    tokenizer = Tokenizer('tests/local-constant.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.CONST, FileLocation('tests/local-constant.nv', 3, 1), 'HELLO'),
                       Token(TokenId.OP, FileLocation('tests/local-constant.nv', 3, 7), 'dump'),
                      ]
 
 def test_lex_tokens_from_file_buffer_string_literal():
-    lexer = Lexer('tests/buffer-string-literal.nv')
+    tokenizer = Tokenizer('tests/buffer-string-literal.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.STR, FileLocation('tests/buffer-string-literal.nv', 1, 1), 'Hello, World!\n'),
                       Token(TokenId.MACRO, FileLocation('tests/buffer-string-literal.nv', 1, 19), 'write'),
@@ -336,7 +366,8 @@ def test_lex_tokens_from_file_buffer_string_literal():
                      ]
 
 def test_lex_tokens_from_file_buffer_store_single_bytes():
-    lexer = Lexer('tests/buffer-store-single-bytes.nv')
+    tokenizer = Tokenizer('tests/buffer-store-single-bytes.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     assert lexer.tokens == [
                       Token(TokenId.OP, FileLocation('tests/buffer-store-single-bytes.nv', 2, 1), 'mem'),
                       Token(TokenId.INT, FileLocation('tests/buffer-store-single-bytes.nv', 2, 5), 0),
@@ -399,31 +430,37 @@ def test_lex_tokens_from_file_buffer_store_single_bytes():
 
 # assign_token_type
 def test_check_assign_token_type_str():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     token = lexer.assign_token_type(token="forty-two", typ="str")
     assert token == (TokenId.STR, "forty-two")
 
 def test_check_assign_token_type_macro():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     token = lexer.assign_token_type(token="forty-two", typ="macro")
     assert token == (TokenId.MACRO, "forty-two")
 
 def test_check_assign_token_type_const():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     token = lexer.assign_token_type(token="forty-two", typ="const")
     assert token == (TokenId.CONST, "forty-two")
 
 def test_check_assign_token_type_int():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     token = lexer.assign_token_type(token="42", typ="int")
     assert token == (TokenId.INT, 42)
 
 def test_check_assign_token_type_int_string_passed_error():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     with pytest.raises(AssertionError):
         lexer.assign_token_type(token="forty-two", typ="int")
 
 def test_check_assign_token_type_operand():
-    lexer = Lexer('tests/arithmetic-plus.nv')
+    tokenizer = Tokenizer('tests/arithmetic-plus.nv')
+    lexer = Lexer(tokenizer.raw_tokens)
     token = lexer.assign_token_type(token="forty-two", typ="op")
     assert token == (TokenId.OP, "forty-two")

@@ -1,11 +1,8 @@
+from nova.tokenizer import Tokenizer
 from nova.lexer import Lexer
-from nova.helpers import find_next
 from nova.builtins import Builtins, OperandId, TokenId
-from nova.dataclasses import Symbol, FileLocation, Token, Operand, Program
+from nova.dataclasses import Token, Operand, Program
 
-
-# TODO implement Lexer as a class ) - is basically a tokenizer, but it usually attaches extra context to the tokens
-# Lexer will define scopes for those tokens (variables/functions)
 
 # TODO add 'import' functionality to create a standard library (initialising macros, consts from library)
 
@@ -20,7 +17,8 @@ def lex_macro_from_builtins(macro):
                 yield(Builtins.BUILTIN_OPS[token], token)
 
 def lex_tokens_from_file(input_file_path: str):
-    lexer = Lexer(input_file_path)
+    tokenizer = Tokenizer(input_file_path)
+    lexer = Lexer(tokenizer.raw_tokens)
     return lexer.tokens
 
 def parse_program_from_file(input_file_path: str) -> Program:
