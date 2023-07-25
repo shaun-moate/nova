@@ -4,13 +4,6 @@ from typing import List, Union
 from nova.builtins import TokenId, OperandId
 
 @dataclass
-class Symbol:
-    start:     int
-    end:       int
-    value:     str
-    string:    bool
-
-@dataclass
 class Word:
     start:     int
     end:       int
