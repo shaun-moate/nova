@@ -1,15 +1,17 @@
-# TODO implement Lexer as a class ) - is basically a tokenizer, but it usually attaches extra context to the tokens
+# Lexer - is basically a tokenizer, but it usually attaches extra context to the tokens
 # Lexer will define scopes for those tokens (variables/functions)
 from nova.builtins import Builtins
 from nova.dataclasses import RawToken, TokenId, Token
 
+# TODO add 'import' functionality to create a standard library (initialising macros, consts from library)
+# TODO Add typing to functions including expected return types
 class Lexer():
     def __init__(self, raw_tokens: list[RawToken]):
         self.raw_tokens = raw_tokens
         self.tokens = []
-        self.lex_tokens_from_file()
+        self.generate_tokens()
 
-    def lex_tokens_from_file(self):
+    def generate_tokens(self):
         i = 0
         # TODO is there a better implementation approach than below (the random index jumps.... blah!)
         while i < len(self.raw_tokens):
@@ -64,11 +66,15 @@ class Lexer():
             except ValueError:
                 assert False, "ERROR: unknown operand"
 
+    # TODO: allow the use of CONST or MACRO in macro call (careful with macro addition as could become recursive)
     def store_macro_to_builtins(self, name: RawToken, tokens: list[RawToken], index: int):
         macro_stack = []
         while tokens[index].value != "end":
-            macro_stack.append(tokens[index].value)
-            index += 1
+            if tokens[index].value in Builtins.BUILTIN_MACRO or tokens[index].value in Builtins.BUILTIN_CONST:
+                assert False, "ERROR: do not allow the use of MACRO or CONST in macro call; please remove"
+            else:
+                macro_stack.append(tokens[index].value)
+                index += 1
         Builtins.BUILTIN_MACRO[name.value] = macro_stack
         return index+1
 

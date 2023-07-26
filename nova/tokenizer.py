@@ -2,13 +2,14 @@ from typing import Generator
 from nova.helpers import find_next
 from nova.dataclasses import Word, FileLocation, RawToken
 
+# TODO Add typing to functions including expected return types
 class Tokenizer():
     def __init__(self, file_path: str):
         self.file_path = file_path
         self.raw_tokens = []
-        self.lex_tokens_from_file()
+        self.generate_raw_tokens()
 
-    def lex_tokens_from_file(self):
+    def generate_raw_tokens(self):
         with open(self.file_path, "r") as file:
             tokens = [
                       RawToken(

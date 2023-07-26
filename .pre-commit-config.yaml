@@ -1,0 +1,11 @@
+# TODO consider the following additions to project
+# pre-commit-hooks: out-of-the-box language agnostic tools
+# flake8: python linter framework
+# autopep8: code formatter
+# reorder-python-imports: import sorter
+# pyupgrade: code formatter
+# add-trailing-comma: code formatter
+# setup-cfg-format: code formatter
+#   - setup.cfg declarative metadata
+# mypy: typechecker
+# setup.py setup.cfg.... : for creating a package?
