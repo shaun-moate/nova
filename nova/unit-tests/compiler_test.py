@@ -17,7 +17,7 @@ def test_compile_program_arithmetic_plus():
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '69\n'
 
-def test_compile_program_arithmetic_minus(capsys):
+def test_compile_program_arithmetic_minus():
     tokenizer = Tokenizer('tests/arithmetic-minus.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -25,7 +25,7 @@ def test_compile_program_arithmetic_minus(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '420\n'
 
-def test_compile_program_arithmetic_multiply(capsys):
+def test_compile_program_arithmetic_multiply():
     tokenizer = Tokenizer('tests/arithmetic-multiply.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -41,7 +41,7 @@ def test_compile_program_arithmetic_divide():
 def test_compile_program_arithmetic_mod():
     pass
 
-def test_compile_program_logical_operator_equal(capsys):
+def test_compile_program_logical_operator_equal():
     tokenizer = Tokenizer('tests/logical-operator-equal.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -49,7 +49,7 @@ def test_compile_program_logical_operator_equal(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '1\n'
 
-def test_compile_program_logical_operator_not_equal(capsys):
+def test_compile_program_logical_operator_not_equal():
     tokenizer = Tokenizer('tests/logical-operator-not-equal.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -57,7 +57,7 @@ def test_compile_program_logical_operator_not_equal(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '0\n'
 
-def test_compile_program_logical_operator_greater_than(capsys):
+def test_compile_program_logical_operator_greater_than():
     tokenizer = Tokenizer('tests/logical-operator-greater-than.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -65,7 +65,7 @@ def test_compile_program_logical_operator_greater_than(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '0\n'
 
-def test_compile_program_logical_operator_greater_than_or_equal_to(capsys):
+def test_compile_program_logical_operator_greater_than_or_equal_to():
     tokenizer = Tokenizer('tests/logical-operator-greater-than-or-equal.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -73,7 +73,7 @@ def test_compile_program_logical_operator_greater_than_or_equal_to(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '1\n'
 
-def test_compile_program_logical_operator_less_than(capsys):
+def test_compile_program_logical_operator_less_than():
     tokenizer = Tokenizer('tests/logical-operator-less-than.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -81,7 +81,7 @@ def test_compile_program_logical_operator_less_than(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '0\n'
 
-def test_compile_program_logical_operator_less_than_or_equal_to(capsys):
+def test_compile_program_logical_operator_less_than_or_equal_to():
     tokenizer = Tokenizer('tests/logical-operator-less-than-or-equal.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -89,7 +89,7 @@ def test_compile_program_logical_operator_less_than_or_equal_to(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '1\n'
 
-def test_compile_program_stack_operator_dump(capsys):
+def test_compile_program_stack_operator_dump():
     tokenizer = Tokenizer('tests/stack-operator-dump.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -97,7 +97,7 @@ def test_compile_program_stack_operator_dump(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '69\n'
 
-def test_compile_program_stack_operator_drop(capsys):
+def test_compile_program_stack_operator_drop():
     tokenizer = Tokenizer('tests/stack-operator-drop.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -105,7 +105,7 @@ def test_compile_program_stack_operator_drop(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '420\n'
 
-def test_compile_program_stack_operator_duplicate(capsys):
+def test_compile_program_stack_operator_duplicate():
     tokenizer = Tokenizer('tests/stack-operator-duplicate.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -113,7 +113,7 @@ def test_compile_program_stack_operator_duplicate(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '69\n69\n'
 
-def test_compile_program_stack_operator_2duplicate(capsys):
+def test_compile_program_stack_operator_2duplicate():
     tokenizer = Tokenizer('tests/stack-operator-2duplicate.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -121,7 +121,7 @@ def test_compile_program_stack_operator_2duplicate(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '420\n69\n420\n69\n'
 
-def test_compile_program_stack_operator_swap(capsys):
+def test_compile_program_stack_operator_swap():
     tokenizer = Tokenizer('tests/stack-operator-swap.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -129,7 +129,7 @@ def test_compile_program_stack_operator_swap(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '1\n2\n'
 
-def test_compile_program_stack_operator_over(capsys):
+def test_compile_program_stack_operator_over():
     tokenizer = Tokenizer('tests/stack-operator-over.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -137,7 +137,7 @@ def test_compile_program_stack_operator_over(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '69\n420\n69\n'
 
-def test_compile_program_bitwise_operator_and(capsys):
+def test_compile_program_bitwise_operator_and():
     tokenizer = Tokenizer('tests/bitwise-operator-and.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -145,7 +145,7 @@ def test_compile_program_bitwise_operator_and(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '2\n'
 
-def test_compile_program_bitwise_operator_or(capsys):
+def test_compile_program_bitwise_operator_or():
     tokenizer = Tokenizer('tests/bitwise-operator-or.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -153,7 +153,7 @@ def test_compile_program_bitwise_operator_or(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '3\n'
 
-def test_compile_program_bitwise_operator_shift_left(capsys):
+def test_compile_program_bitwise_operator_shift_left():
     tokenizer = Tokenizer('tests/bitwise-operator-shift-left.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -161,7 +161,7 @@ def test_compile_program_bitwise_operator_shift_left(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '8\n'
 
-def test_compile_program_bitwise_operator_shift_right(capsys):
+def test_compile_program_bitwise_operator_shift_right():
     tokenizer = Tokenizer('tests/bitwise-operator-shift-right.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -169,7 +169,7 @@ def test_compile_program_bitwise_operator_shift_right(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '1\n'
 
-def test_compile_program_conditional_if(capsys):
+def test_compile_program_conditional_if():
     tokenizer = Tokenizer('tests/conditional-if.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -177,7 +177,7 @@ def test_compile_program_conditional_if(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '420\n'
 
-def test_compile_program_conditional_if_else(capsys):
+def test_compile_program_conditional_if_else():
     tokenizer = Tokenizer('tests/conditional-if-else.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -185,7 +185,7 @@ def test_compile_program_conditional_if_else(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '6969\n'
 
-def test_compile_program_conditional_nested_if_else(capsys):
+def test_compile_program_conditional_nested_if_else():
     tokenizer = Tokenizer('tests/conditional-nested-if-else.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -193,7 +193,7 @@ def test_compile_program_conditional_nested_if_else(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '420\n'
 
-def test_compile_program_conditional_while(capsys):
+def test_compile_program_conditional_while():
     tokenizer = Tokenizer('tests/conditional-while-loop.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -201,7 +201,7 @@ def test_compile_program_conditional_while(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n'
 
-def test_compile_program_conditional_nested_while_if(capsys):
+def test_compile_program_conditional_nested_while_if():
     tokenizer = Tokenizer('tests/conditional-nested-while-if-loop.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -209,7 +209,7 @@ def test_compile_program_conditional_nested_while_if(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == '3\n'
 
-def test_compile_program_conditional_nested_while(capsys):
+def test_compile_program_conditional_nested_while():
     tokenizer = Tokenizer('tests/conditional-nested-while-loop.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -225,7 +225,7 @@ def test_compile_program_conditional_and():
 def test_compile_program_conditional_or():
     pass
 
-def test_compile_program_buffer_string_literal(capsys):
+def test_compile_program_buffer_string_literal():
     tokenizer = Tokenizer('tests/buffer-string-literal.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
@@ -233,7 +233,7 @@ def test_compile_program_buffer_string_literal(capsys):
     captured = subprocess.run(["build/output"], capture_output = True, text = True)
     assert captured.stdout == 'Hello, World!\nWhatcha Doing!\n'
 
-def test_compile_program_buffer_store_single_bytes(capsys):
+def test_compile_program_buffer_store_single_bytes():
     tokenizer = Tokenizer('tests/buffer-store-single-bytes.nv')
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
