@@ -3,11 +3,10 @@ from nova.tokenizer import Tokenizer
 from nova.lexer import Lexer
 from nova.dataclasses import FileLocation, TokenId, Token
 
-# lex_tokens():
+# generate_tokens():
 def test_lex_tokens_from_file_arithmetic_plus():
     tokenizer = Tokenizer('tests/arithmetic-plus.nv')
     lexer = Lexer(tokenizer.raw_tokens)
-    print(lexer.tokens)
     assert lexer.tokens == [
                       Token(TokenId.INT, FileLocation('tests/arithmetic-plus.nv', 2, 1), 34),
                       Token(TokenId.INT, FileLocation('tests/arithmetic-plus.nv', 2, 4), 35),
