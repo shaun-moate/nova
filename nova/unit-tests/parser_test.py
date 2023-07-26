@@ -292,7 +292,7 @@ def test_generate_program_conditional_while():
     lexer = Lexer(tokenizer.raw_tokens)
     parser = Parser(lexer.tokens)
     assert parser.program == Program([
-                      Operand(OperandId.PUSH_INT, -1, -1, FileLocation('tests/conditional-while-loop.nv', 2, 1), 69),
+                      Operand(OperandId.PUSH_INT, -1, -1, FileLocation('tests/conditional-while-loop.nv', 2, 1), 10),
                       Operand(OperandId.WHILE, -1, -1, FileLocation('tests/conditional-while-loop.nv', 3, 1), 'while'),
                       Operand(OperandId.DUP, -1, -1, FileLocation('tests/conditional-while-loop.nv', 3, 7), 'dup'),
                       Operand(OperandId.PUSH_INT, -1, -1, FileLocation('tests/conditional-while-loop.nv', 3, 11), 0),

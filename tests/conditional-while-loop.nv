@@ -1,5 +1,5 @@
-// count down from 69 to 0
-69
+// count down from 10 to 1
+10
 while dup 0 > do
    dup dump
    1 -

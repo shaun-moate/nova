@@ -26,8 +26,7 @@ if __name__ == "__main__":
         tokenizer = Tokenizer(input_file_path)
         lexer = Lexer(tokenizer.raw_tokens)
         parser = Parser(lexer.tokens)
-        print(parser.program)
-        # simulate_program(parser.program)
+        simulate_program(parser.program)
     elif subcommand == "--compile" or subcommand == "-c":
         if len(argv) > 1:
             (option, argv) = uncons(argv)
